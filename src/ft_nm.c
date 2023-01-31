@@ -6,7 +6,7 @@
 /*   By: timothee <timothee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/24 14:34:28 by tlafay            #+#    #+#             */
-/*   Updated: 2023/01/25 09:07:10 by timothee         ###   ########.fr       */
+/*   Updated: 2023/01/31 13:06:36 by timothee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,11 +39,23 @@ void	write_header(char *header, t_file file)
 		*header = (int)file.buffer[i];
 }
 
+int	is_64bits(Elf64_Ehdr *header)
+{
+	return (header->e_ident[EI_CLASS] == ELFCLASS64);
+}
+
+int	is_32bits(Elf32_Ehdr *header)
+{
+	return (header->e_ident[EI_CLASS] == ELFCLASS32);
+}
+
 int	main(int argc, char **argv)
 {
 	char		*path;
 	t_file		file;
-	Elf64_Ehdr *header;
+	Elf64_Ehdr	*header;
+	Elf64_Shdr	*symtab;
+	Elf64_Shdr	*strtab;
 
 	if (argc == 2)
 		path = argv[1];
@@ -58,7 +70,30 @@ int	main(int argc, char **argv)
 	header = (Elf64_Ehdr *)file.buffer;
 	if (ft_memcmp(header->e_ident, ELFMAG, SELFMAG) || header->e_ident[EI_CLASS] != ELFCLASS64)
 		return file_format_not_recognized(argv, path);
-	munmap((void *)file.buffer, file.size);
 
+
+	Elf64_Shdr *sections = (Elf64_Shdr *)((char *)file.buffer + header->e_shoff);
+	char *section_names = (char *)(file.buffer + sections[header->e_shstrndx].sh_offset);
+
+	for (int i = 0; i < header->e_shnum; i++)
+	{
+		if (sections[i].sh_size)
+		{
+			if (ft_strncmp(&section_names[sections[i].sh_name], ".symtab", 7) == 0)
+				symtab = (Elf64_Shdr *) &sections[i];
+			if (ft_strncmp(&section_names[sections[i].sh_name], ".strtab", 7) == 0)
+				strtab = (Elf64_Shdr *) &sections[i];
+		}
+	}
+
+	Elf64_Sym *sym = (Elf64_Sym*) (file.buffer + symtab->sh_offset);
+	char *str = (char*) (file.buffer + strtab->sh_offset);
+
+	for (size_t i = 0; i < symtab->sh_size / sizeof(Elf64_Sym); i++)
+	{
+		printf("%016lx %s\n", sym[i].st_value, str + sym[i].st_name);
+	}
+
+	munmap((void *)file.buffer, file.size);
 	return (0);
 }
