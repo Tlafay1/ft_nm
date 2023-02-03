@@ -71,8 +71,6 @@ int	main(int argc, char **argv)
 	if (ft_memcmp(header->e_ident, ELFMAG, SELFMAG))
 		return file_format_not_recognized(argv, path);
 
-	printf("%d\n", is_32bits((Elf32_Ehdr *)file.buffer));
-
 	Elf64_Shdr *sections = (Elf64_Shdr *)((char *)file.buffer + header->e_shoff);
 	char *section_names = (char *)(file.buffer + sections[header->e_shstrndx].sh_offset);
 
