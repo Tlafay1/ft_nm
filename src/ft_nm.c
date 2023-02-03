@@ -6,7 +6,7 @@
 /*   By: timothee <timothee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/24 14:34:28 by tlafay            #+#    #+#             */
-/*   Updated: 2023/01/31 13:06:36 by timothee         ###   ########.fr       */
+/*   Updated: 2023/02/03 03:40:09 by timothee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,9 +68,10 @@ int	main(int argc, char **argv)
 	}
 
 	header = (Elf64_Ehdr *)file.buffer;
-	if (ft_memcmp(header->e_ident, ELFMAG, SELFMAG) || header->e_ident[EI_CLASS] != ELFCLASS64)
+	if (ft_memcmp(header->e_ident, ELFMAG, SELFMAG))
 		return file_format_not_recognized(argv, path);
 
+	printf("%d\n", is_32bits((Elf32_Ehdr *)file.buffer));
 
 	Elf64_Shdr *sections = (Elf64_Shdr *)((char *)file.buffer + header->e_shoff);
 	char *section_names = (char *)(file.buffer + sections[header->e_shstrndx].sh_offset);
@@ -86,8 +87,8 @@ int	main(int argc, char **argv)
 		}
 	}
 
-	Elf64_Sym *sym = (Elf64_Sym*) (file.buffer + symtab->sh_offset);
-	char *str = (char*) (file.buffer + strtab->sh_offset);
+	Elf64_Sym *sym = (Elf64_Sym *) (file.buffer + symtab->sh_offset);
+	char *str = (char *) (file.buffer + strtab->sh_offset);
 
 	for (size_t i = 0; i < symtab->sh_size / sizeof(Elf64_Sym); i++)
 	{
