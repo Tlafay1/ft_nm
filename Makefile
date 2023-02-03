@@ -2,7 +2,7 @@ CC = gcc
 
 NAME := ft_nm
 
-CFLAGS := -Wall -Wextra -Werror
+CFLAGS := -Wall -Wextra -Werror -g
 
 SRCS := ft_nm.c
 
