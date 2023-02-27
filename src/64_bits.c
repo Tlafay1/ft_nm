@@ -6,7 +6,7 @@
 /*   By: tlafay <tlafay@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/03 17:20:42 by tlafay            #+#    #+#             */
-/*   Updated: 2023/02/06 15:16:32 by tlafay           ###   ########.fr       */
+/*   Updated: 2023/02/06 16:15:18 by tlafay           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,35 +14,29 @@
 
 void	parse_64bits(char *buffer)
 {
-	Elf64_Shdr	*shdr;
+	Elf64_Shdr	*sections;
 	Elf64_Ehdr	*header;
-	Elf64_Shdr	*symtab;
-	Elf64_Shdr	*strtab;
 
 	header = (Elf64_Ehdr *)buffer;
-	shdr = (Elf64_Shdr *)((char *)buffer + header->e_shoff);
-	char *section_names = (char *)(buffer + shdr[header->e_shstrndx].sh_offset);
+	sections = (Elf64_Shdr *)((char *)buffer + header->e_shoff);
+	// char *section_names = (char *)(buffer + sections[header->e_shstrndx].sh_offset);
 
 	for (int i = 0; i < header->e_shnum; i++)
 	{
-		if (shdr[i].sh_size)
+		if (sections[i].sh_type == SHT_SYMTAB)
 		{
-			if (ft_strncmp(&section_names[shdr[i].sh_name], ".symtab", 7) == 0)
-				symtab = (Elf64_Shdr *) &shdr[i];
-			if (ft_strncmp(&section_names[shdr[i].sh_name], ".strtab", 7) == 0)
-				strtab = (Elf64_Shdr *) &shdr[i];
-		}
-	}
-
-	Elf64_Sym *sym = (Elf64_Sym *) (buffer + symtab->sh_offset);
-	char *str = (char *) (buffer + strtab->sh_offset);
-
-	for (size_t i = 0; i < symtab->sh_size / sizeof(Elf64_Sym); i++)
-	{
-		if (ft_strlen(str + sym[i].st_name) > 0)
-		{
-			printf("%016lx %s\n", sym[i].st_value, str + sym[i].st_name);
-			printf("%c\n", print_type64(*sym, symtab));
+			Elf64_Sym *symtab = (Elf64_Sym *)(buffer + sections[i].sh_offset);
+			int symbol_num = sections[i].sh_size / sections[i].sh_entsize;
+			char *symbol_names = (char *)(buffer + sections[sections[i].sh_link].sh_offset);
+			for (int j = 0; j < symbol_num; j++)
+			{
+				if (symtab[j].st_value)
+					printf("%016lx %c %s\n", symtab[j].st_value,
+						print_type64(symtab[j], sections), symbol_names + symtab[j].st_name);
+				else
+					printf("                 %c %s\n", print_type64(symtab[j], sections),
+						symbol_names + symtab[j].st_name);
+			}
 		}
 	}
 }

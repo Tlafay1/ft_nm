@@ -6,7 +6,7 @@
 /*   By: tlafay <tlafay@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/03 17:20:43 by tlafay            #+#    #+#             */
-/*   Updated: 2023/02/06 10:11:34 by tlafay           ###   ########.fr       */
+/*   Updated: 2023/02/27 16:44:51 by tlafay           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,33 +16,31 @@ void	parse_32bits(char *buffer)
 {
 	Elf32_Shdr	*sections;
 	Elf32_Ehdr	*header;
-	Elf32_Shdr	*symtab;
-	Elf32_Shdr	*strtab;
 
 	header = (Elf32_Ehdr *)buffer;
 	sections = (Elf32_Shdr *)((char *)buffer + header->e_shoff);
-	char *section_names = (char *)(buffer + sections[header->e_shstrndx].sh_offset);
+	// char *section_names = (char *)(buffer + sections[header->e_shstrndx].sh_offset);
 
 	for (int i = 0; i < header->e_shnum; i++)
 	{
-		if (sections[i].sh_size)
+		if (sections[i].sh_type == SHT_SYMTAB)
 		{
-			if (ft_strncmp(&section_names[sections[i].sh_name], ".symtab", 7) == 0)
-				symtab = (Elf32_Shdr *) &sections[i];
-			if (ft_strncmp(&section_names[sections[i].sh_name], ".strtab", 7) == 0)
-				strtab = (Elf32_Shdr *) &sections[i];
-		}
-	}
-
-	Elf32_Sym *sym = (Elf32_Sym *) (buffer + symtab->sh_offset);
-	char *str = (char *) (buffer + strtab->sh_offset);
-
-	for (size_t i = 0; i < symtab->sh_size / sizeof(Elf32_Sym); i++)
-	{
-		if (ft_strlen(str + sym[i].st_name) > 0)
-		{
-			printf("%016x %s\n", sym[i].st_value, str + sym[i].st_name);
-			printf("%c\n", print_type32(*sym, strtab));
+			Elf32_Sym *symtab = (Elf32_Sym *)(buffer + sections[i].sh_offset);
+			int symbol_num = sections[i].sh_size / sections[i].sh_entsize;
+			char *symbol_names = (char *)(buffer + sections[sections[i].sh_link].sh_offset);
+			for (int j = 0; j < symbol_num; j++)
+			{
+				if (symtab[j].st_value)
+				{
+					printf("%08x %c %s\n", symtab[j].st_value,
+						print_type32(symtab[j], &sections[i]), symbol_names + symtab[j].st_name);
+				}
+				else
+				{
+					printf("         %c %s\n", print_type32(symtab[j], &sections[i]),
+						symbol_names + symtab[j].st_name);
+				}
+			}
 		}
 	}
 }
