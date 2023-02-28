@@ -6,20 +6,34 @@
 /*   By: tlafay <tlafay@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/03 17:20:42 by tlafay            #+#    #+#             */
-/*   Updated: 2023/02/06 16:15:18 by tlafay           ###   ########.fr       */
+/*   Updated: 2023/02/28 18:00:05 by tlafay           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_nm.h"
 
+void	print_sym64(void *content)
+{
+	t_output	*output;
+
+	output = (t_output *)content;
+	if (output->value)
+		printf("%016lx %c %s\n", output->value,
+			output->type, output->name);
+	else
+		printf("                 %c %s\n", output->type,
+			output->name);
+}
+
 void	parse_64bits(char *buffer)
 {
 	Elf64_Shdr	*sections;
 	Elf64_Ehdr	*header;
+	t_list		*head;
 
+	head = NULL;
 	header = (Elf64_Ehdr *)buffer;
 	sections = (Elf64_Shdr *)((char *)buffer + header->e_shoff);
-	// char *section_names = (char *)(buffer + sections[header->e_shstrndx].sh_offset);
 
 	for (int i = 0; i < header->e_shnum; i++)
 	{
@@ -30,18 +44,21 @@ void	parse_64bits(char *buffer)
 			char *symbol_names = (char *)(buffer + sections[sections[i].sh_link].sh_offset);
 			for (int j = 0; j < symbol_num; j++)
 			{
-				if (symtab[j].st_value)
-					printf("%016lx %c %s\n", symtab[j].st_value,
-						print_type64(symtab[j], sections), symbol_names + symtab[j].st_name);
-				else
-					printf("                 %c %s\n", print_type64(symtab[j], sections),
-						symbol_names + symtab[j].st_name);
+				add_section(&head, symtab[j].st_value,
+					get_type64(symtab[j], sections), symbol_names + symtab[j].st_name);
+				// if (symtab[j].st_value)
+				// 	printf("%016lx %c %s\n", symtab[j].st_value,
+				// 		get_type64(symtab[j], sections), symbol_names + symtab[j].st_name);
+				// else
+				// 	printf("                 %c %s\n", get_type64(symtab[j], sections),
+				// 		symbol_names + symtab[j].st_name);
 			}
 		}
 	}
+	ft_lstiter(head, print_sym64);
 }
 
-char	print_type64(Elf64_Sym sym, Elf64_Shdr *shdr)
+char	get_type64(Elf64_Sym sym, Elf64_Shdr *shdr)
 {
 	char	c;
 

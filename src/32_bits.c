@@ -6,7 +6,7 @@
 /*   By: tlafay <tlafay@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/03 17:20:43 by tlafay            #+#    #+#             */
-/*   Updated: 2023/02/27 16:44:51 by tlafay           ###   ########.fr       */
+/*   Updated: 2023/02/28 17:10:21 by tlafay           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,10 +16,10 @@ void	parse_32bits(char *buffer)
 {
 	Elf32_Shdr	*sections;
 	Elf32_Ehdr	*header;
+	// t_list		*head;
 
 	header = (Elf32_Ehdr *)buffer;
 	sections = (Elf32_Shdr *)((char *)buffer + header->e_shoff);
-	// char *section_names = (char *)(buffer + sections[header->e_shstrndx].sh_offset);
 
 	for (int i = 0; i < header->e_shnum; i++)
 	{
@@ -33,11 +33,11 @@ void	parse_32bits(char *buffer)
 				if (symtab[j].st_value)
 				{
 					printf("%08x %c %s\n", symtab[j].st_value,
-						print_type32(symtab[j], &sections[i]), symbol_names + symtab[j].st_name);
+						get_type32(symtab[j], &sections[i]), symbol_names + symtab[j].st_name);
 				}
 				else
 				{
-					printf("         %c %s\n", print_type32(symtab[j], &sections[i]),
+					printf("         %c %s\n", get_type32(symtab[j], &sections[i]),
 						symbol_names + symtab[j].st_name);
 				}
 			}
@@ -45,7 +45,9 @@ void	parse_32bits(char *buffer)
 	}
 }
 
-char	print_type32(Elf32_Sym sym, Elf32_Shdr *shdr)
+// Don't print a, n, symbol names starting with a '.'
+
+char	get_type32(Elf32_Sym sym, Elf32_Shdr *shdr)
 {
 	char	c;
 
