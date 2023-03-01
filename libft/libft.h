@@ -6,7 +6,7 @@
 /*   By: tlafay <tlafay@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/05 10:52:35 by tlafay            #+#    #+#             */
-/*   Updated: 2022/02/02 11:19:50 by tlafay           ###   ########.fr       */
+/*   Updated: 2023/03/01 09:46:12 by tlafay           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,8 @@ void			ft_lstadd_back(t_list **alst, t_list *new);
 t_list			*ft_lstlast(t_list *lst);
 t_list			*ft_lstnew(void *content);
 void			ft_lstadd_front(t_list **alst, t_list *new);
+void			ft_lstadd_sorted(t_list **head, t_list *new,
+					int (*compare)(t_list *, t_list *));
 int				ft_lstsize(t_list *lst);
 int				ft_isalnum(int c);
 int				ft_strlen(const char *str);

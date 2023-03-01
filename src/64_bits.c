@@ -6,7 +6,7 @@
 /*   By: tlafay <tlafay@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/03 17:20:42 by tlafay            #+#    #+#             */
-/*   Updated: 2023/02/28 18:00:05 by tlafay           ###   ########.fr       */
+/*   Updated: 2023/03/01 13:43:43 by tlafay           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,12 +46,6 @@ void	parse_64bits(char *buffer)
 			{
 				add_section(&head, symtab[j].st_value,
 					get_type64(symtab[j], sections), symbol_names + symtab[j].st_name);
-				// if (symtab[j].st_value)
-				// 	printf("%016lx %c %s\n", symtab[j].st_value,
-				// 		get_type64(symtab[j], sections), symbol_names + symtab[j].st_name);
-				// else
-				// 	printf("                 %c %s\n", get_type64(symtab[j], sections),
-				// 		symbol_names + symtab[j].st_name);
 			}
 		}
 	}
@@ -64,6 +58,8 @@ char	get_type64(Elf64_Sym sym, Elf64_Shdr *shdr)
 
 	if (ELF64_ST_BIND(sym.st_info) == STB_GNU_UNIQUE)
 		c = 'u';
+	else if (ELF64_ST_TYPE(sym.st_info) == STT_SECTION)
+		c = 0;
 	else if (ELF64_ST_BIND(sym.st_info) == STB_WEAK)
 	{
 		c = 'W';
@@ -98,7 +94,7 @@ char	get_type64(Elf64_Sym sym, Elf64_Shdr *shdr)
 		c = 'D';
 	else
 		c = '?';
-	if (ELF64_ST_BIND(sym.st_info) == STB_LOCAL && c != '?')
+	if (c && ELF64_ST_BIND(sym.st_info) == STB_LOCAL && c != '?')
 		c += 32;
 	return c;
 }

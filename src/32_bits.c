@@ -6,7 +6,7 @@
 /*   By: tlafay <tlafay@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/03 17:20:43 by tlafay            #+#    #+#             */
-/*   Updated: 2023/02/28 17:10:21 by tlafay           ###   ########.fr       */
+/*   Updated: 2023/03/01 11:02:16 by tlafay           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,14 +45,14 @@ void	parse_32bits(char *buffer)
 	}
 }
 
-// Don't print a, n, symbol names starting with a '.'
-
 char	get_type32(Elf32_Sym sym, Elf32_Shdr *shdr)
 {
 	char	c;
 
 	if (ELF32_ST_BIND(sym.st_info) == STB_GNU_UNIQUE)
 		c = 'u';
+	else if (ELF32_ST_TYPE(sym.st_info) == STT_SECTION)
+		c = 0;
 	else if (ELF32_ST_BIND(sym.st_info) == STB_WEAK)
 	{
 		c = 'W';
@@ -87,7 +87,7 @@ char	get_type32(Elf32_Sym sym, Elf32_Shdr *shdr)
 		c = 'D';
 	else
 		c = '?';
-	if (ELF32_ST_BIND(sym.st_info) == STB_LOCAL && c != '?')
+	if (c && ELF32_ST_BIND(sym.st_info) == STB_LOCAL && c != '?')
 		c += 32;
 	return c;
 }
