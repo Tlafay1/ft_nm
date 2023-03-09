@@ -6,7 +6,7 @@
 /*   By: tlafay <tlafay@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/03 17:20:42 by tlafay            #+#    #+#             */
-/*   Updated: 2023/03/01 13:43:43 by tlafay           ###   ########.fr       */
+/*   Updated: 2023/03/09 09:39:32 by tlafay           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,16 +84,22 @@ char	get_type64(Elf64_Sym sym, Elf64_Shdr *shdr)
 	else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS
 		&& shdr[sym.st_shndx].sh_flags == SHF_ALLOC)
 		c = 'R';
-	else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS
+	else if ((shdr[sym.st_shndx].sh_type == SHT_PROGBITS
+			|| shdr[sym.st_shndx].sh_type == SHT_INIT_ARRAY
+			|| shdr[sym.st_shndx].sh_type == SHT_FINI_ARRAY
+			|| shdr[sym.st_shndx].sh_type == SHT_FINI_ARRAY)
 		&& shdr[sym.st_shndx].sh_flags == (SHF_ALLOC | SHF_WRITE))
+		c = 'D';
+	else if (shdr[sym.st_shndx].sh_type == SHT_DYNAMIC)
 		c = 'D';
 	else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS
 		&& shdr[sym.st_shndx].sh_flags == (SHF_ALLOC | SHF_EXECINSTR))
 		c = 'T';
-	else if (shdr[sym.st_shndx].sh_type == SHT_DYNAMIC)
-		c = 'D';
 	else
+	{
 		c = '?';
+		printf("%d %d %ld\n", sym.st_shndx, shdr[sym.st_shndx].sh_type, shdr[sym.st_shndx].sh_flags);
+	}
 	if (c && ELF64_ST_BIND(sym.st_info) == STB_LOCAL && c != '?')
 		c += 32;
 	return c;

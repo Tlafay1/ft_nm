@@ -40,6 +40,6 @@ void	parse_64bits(char *buffer);
 void	parse_32bits(char *buffer);
 char	get_type64(Elf64_Sym sym, Elf64_Shdr *shdr);
 char	get_type32(Elf32_Sym sym, Elf32_Shdr *shdr);
-void	add_section(t_list **head, long unsigned int value, char type, char *name);
+int		add_section(t_list **head, long unsigned int value, char type, char *name);
 
 #endif

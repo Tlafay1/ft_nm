@@ -6,17 +6,30 @@
 /*   By: tlafay <tlafay@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/03 17:20:43 by tlafay            #+#    #+#             */
-/*   Updated: 2023/03/01 11:02:16 by tlafay           ###   ########.fr       */
+/*   Updated: 2023/03/09 09:39:36 by tlafay           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_nm.h"
 
+void	print_sym32(void *content)
+{
+	t_output	*output;
+
+	output = (t_output *)content;
+	if (output->value)
+		printf("%016lx %c %s\n", output->value,
+			output->type, output->name);
+	else
+		printf("         %c %s\n", output->type,
+			output->name);
+}
+
 void	parse_32bits(char *buffer)
 {
 	Elf32_Shdr	*sections;
 	Elf32_Ehdr	*header;
-	// t_list		*head;
+	t_list		*head;
 
 	header = (Elf32_Ehdr *)buffer;
 	sections = (Elf32_Shdr *)((char *)buffer + header->e_shoff);
@@ -30,19 +43,12 @@ void	parse_32bits(char *buffer)
 			char *symbol_names = (char *)(buffer + sections[sections[i].sh_link].sh_offset);
 			for (int j = 0; j < symbol_num; j++)
 			{
-				if (symtab[j].st_value)
-				{
-					printf("%08x %c %s\n", symtab[j].st_value,
-						get_type32(symtab[j], &sections[i]), symbol_names + symtab[j].st_name);
-				}
-				else
-				{
-					printf("         %c %s\n", get_type32(symtab[j], &sections[i]),
-						symbol_names + symtab[j].st_name);
-				}
+				add_section(&head, symtab[j].st_value,
+					get_type32(symtab[j], sections), symbol_names + symtab[j].st_name);
 			}
 		}
 	}
+	ft_lstiter(head, print_sym32);
 }
 
 char	get_type32(Elf32_Sym sym, Elf32_Shdr *shdr)
@@ -77,16 +83,22 @@ char	get_type32(Elf32_Sym sym, Elf32_Shdr *shdr)
 	else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS
 		&& shdr[sym.st_shndx].sh_flags == SHF_ALLOC)
 		c = 'R';
-	else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS
+	else if ((shdr[sym.st_shndx].sh_type == SHT_PROGBITS
+			|| shdr[sym.st_shndx].sh_type == SHT_INIT_ARRAY
+			|| shdr[sym.st_shndx].sh_type == SHT_FINI_ARRAY
+			|| shdr[sym.st_shndx].sh_type == SHT_FINI_ARRAY)
 		&& shdr[sym.st_shndx].sh_flags == (SHF_ALLOC | SHF_WRITE))
+		c = 'D';
+	else if (shdr[sym.st_shndx].sh_type == SHT_DYNAMIC)
 		c = 'D';
 	else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS
 		&& shdr[sym.st_shndx].sh_flags == (SHF_ALLOC | SHF_EXECINSTR))
 		c = 'T';
-	else if (shdr[sym.st_shndx].sh_type == SHT_DYNAMIC)
-		c = 'D';
 	else
+	{
 		c = '?';
+		printf("%d %d %d\n", sym.st_shndx, shdr[sym.st_shndx].sh_type, shdr[sym.st_shndx].sh_flags);
+	}
 	if (c && ELF32_ST_BIND(sym.st_info) == STB_LOCAL && c != '?')
 		c += 32;
 	return c;

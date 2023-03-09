@@ -38,17 +38,22 @@ int	nm_strcmp(t_list *n1, t_list *n2)
 	return ((unsigned char)ft_tolower(*s1) - (unsigned char)ft_tolower(*s2));
 }
 
-void	add_section(t_list **head, long unsigned int value, char type, char *name)
+int	add_section(t_list **head, long unsigned int value, char type, char *name)
 {
 	t_list		*node;
 	t_output	*output;
 
 	output = (t_output *)malloc(sizeof(t_output));
+	if (!output)
+		return -1;
 	output->value = value;
 	output->type = type;
 	output->name = name;
 	if (!output->type || output->type == 'a' || output->type == 'u')
-		return ;
+		return 1;
 	node = ft_lstnew((void *)output);
+	if (!node)
+		return -1;
 	ft_lstadd_sorted(head, node, nm_strcmp);
+	return 0;
 }
