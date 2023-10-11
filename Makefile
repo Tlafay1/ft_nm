@@ -2,7 +2,7 @@ CC = gcc
 
 NAME := ft_nm
 
-CFLAGS := -Wall -Wextra -Werror -fsanitize=address
+CFLAGS := -g
 
 SRCS := ft_nm.c 32_bits.c 64_bits.c utils.c
 

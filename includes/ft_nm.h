@@ -36,7 +36,7 @@ typedef struct s_output
 	char				*name;
 }	t_output;
 
-void	parse_64bits(char *buffer);
+void	parse_64bits(t_file	file);
 void	parse_32bits(char *buffer);
 char	get_type64(Elf64_Sym sym, Elf64_Shdr *shdr);
 char	get_type32(Elf32_Sym sym, Elf32_Shdr *shdr);

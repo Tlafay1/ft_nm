@@ -6,11 +6,18 @@
 /*   By: tlafay <tlafay@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/24 14:34:28 by tlafay            #+#    #+#             */
-/*   Updated: 2023/03/01 10:40:49 by tlafay           ###   ########.fr       */
+/*   Updated: 2023/10/11 12:48:56 by tlafay           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_nm.h"
+
+
+/*
+	Read the file specified in argument.
+	Returns a structure containing the size
+	of the file and the pointer to the buffer. 
+*/
 
 int read_file(char *path, t_file *file)
 {
@@ -27,17 +34,22 @@ int read_file(char *path, t_file *file)
 	return 0;
 }
 
+
+/*
+	Error message thrown when the file is not ELF
+*/
+
 int	file_format_not_recognized(char **argv, char *path)
 {
 	printf("%s: '%s': file format not recognized\n", argv[0], path);
 	return (1);
 }
 
-void	write_header(char *header, t_file file)
-{
-	for (int i = 0; i < file.size; i++, header++)
-		*header = (int)file.buffer[i];
-}
+
+/*
+	Check if the file is an elf executable.
+	We use the magic number for that.
+*/
 
 int is_elf(Elf32_Ehdr *header)
 {
@@ -45,6 +57,11 @@ int is_elf(Elf32_Ehdr *header)
 		return 1;
 	return 0;
 }
+
+
+/*
+	Check if the file is 64 bits.
+*/
 
 int	is_64bits(Elf64_Ehdr *header)
 {
@@ -56,12 +73,12 @@ int	is_32bits(Elf32_Ehdr *header)
 	return (header->e_ident[EI_CLASS] == ELFCLASS32);
 }
 
-void	parse_elf(char *buffer, char **argv, char *path)
+void	parse_elf(t_file file, char **argv, char *path)
 {
-	if (is_32bits((Elf32_Ehdr *)buffer))
-		parse_32bits(buffer);
-	else if (is_64bits((Elf64_Ehdr *)buffer))
-		parse_64bits(buffer);
+	if (is_32bits((Elf32_Ehdr *)file.buffer))
+		parse_32bits(file.buffer);
+	else if (is_64bits((Elf64_Ehdr *)file.buffer))
+		parse_64bits(file);
 	else
 		file_format_not_recognized(argv, path);
 }
@@ -82,7 +99,7 @@ int	main(int argc, char **argv)
 	}
 
 	if (is_elf((Elf32_Ehdr *)file.buffer))
-		parse_elf(file.buffer, argv, path);
+		parse_elf(file, argv, path);
 	else
 		return file_format_not_recognized(argv, path);
 
