@@ -6,7 +6,7 @@
 /*   By: tlafay <tlafay@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/24 14:34:28 by tlafay            #+#    #+#             */
-/*   Updated: 2023/10/11 12:48:56 by tlafay           ###   ########.fr       */
+/*   Updated: 2023/10/11 16:43:02 by tlafay           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,7 @@ int	is_32bits(Elf32_Ehdr *header)
 void	parse_elf(t_file file, char **argv, char *path)
 {
 	if (is_32bits((Elf32_Ehdr *)file.buffer))
-		parse_32bits(file.buffer);
+		parse_32bits(file);
 	else if (is_64bits((Elf64_Ehdr *)file.buffer))
 		parse_64bits(file);
 	else
