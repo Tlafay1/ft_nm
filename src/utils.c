@@ -6,7 +6,7 @@
 /*   By: tlafay <tlafay@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 16:20:43 by tlafay            #+#    #+#             */
-/*   Updated: 2023/10/11 17:20:22 by tlafay           ###   ########.fr       */
+/*   Updated: 2023/10/12 16:43:42 by tlafay           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,4 +56,9 @@ int	add_section(t_list **head, long unsigned int value, char type, char *name)
 		return -1;
 	ft_lstadd_sorted(head, node, nm_strcmp);
 	return 0;
+}
+
+int out_of_bounds(void *ptr)
+{
+	return ptr > (void *)g_file.end;
 }

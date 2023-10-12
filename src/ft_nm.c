@@ -6,11 +6,18 @@
 /*   By: tlafay <tlafay@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/24 14:34:28 by tlafay            #+#    #+#             */
-/*   Updated: 2023/10/11 16:43:02 by tlafay           ###   ########.fr       */
+/*   Updated: 2023/10/12 17:30:06 by tlafay           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_nm.h"
+
+
+/*
+	Need to define the variable once
+*/
+
+t_file	g_file;
 
 
 /*
@@ -19,7 +26,7 @@
 	of the file and the pointer to the buffer. 
 */
 
-int read_file(char *path, t_file *file)
+int read_file(char *path)
 {
 	int			fd;
 	struct stat	buf;
@@ -29,8 +36,9 @@ int read_file(char *path, t_file *file)
 		return -1;
 	if (fstat(fd, &buf) == -1)
 		return -1;
-	file->size = buf.st_size;
-	file->buffer = (char *)mmap(0, file->size, PROT_READ, MAP_PRIVATE, fd, 0);
+	g_file.size = buf.st_size;
+	g_file.buffer = mmap(0, g_file.size, PROT_READ, MAP_PRIVATE, fd, 0);
+	g_file.end = g_file.buffer + g_file.size;
 	return 0;
 }
 
@@ -73,36 +81,38 @@ int	is_32bits(Elf32_Ehdr *header)
 	return (header->e_ident[EI_CLASS] == ELFCLASS32);
 }
 
-void	parse_elf(t_file file, char **argv, char *path)
+void	parse_elf(char **argv, char *path)
 {
-	if (is_32bits((Elf32_Ehdr *)file.buffer))
-		parse_32bits(file);
-	else if (is_64bits((Elf64_Ehdr *)file.buffer))
-		parse_64bits(file);
+	if (!out_of_bounds(g_file.buffer + sizeof(Elf64_Ehdr))
+		&& is_32bits((Elf32_Ehdr *)g_file.buffer))
+		parse_32bits();
+	else if (!out_of_bounds(g_file.buffer + sizeof(Elf64_Ehdr))
+		&& is_64bits((Elf64_Ehdr *)g_file.buffer))
+		parse_64bits();
 	else
 		file_format_not_recognized(argv, path);
 }
 
 int	main(int argc, char **argv)
 {
-	char		*path;
-	t_file		file;
+	char	*path;
 
 	if (argc == 2)
 		path = argv[1];
 	else
 		path = "a.out";
-	if (read_file(path, &file))
+	if (read_file(path))
 	{
 		printf("%s: '%s': No such file\n", argv[0], path);
 		return (1);
 	}
 
-	if (is_elf((Elf32_Ehdr *)file.buffer))
-		parse_elf(file, argv, path);
+	if (!out_of_bounds(g_file.buffer + EI_NIDENT)
+		&& is_elf((Elf32_Ehdr *)g_file.buffer))
+		parse_elf(argv, path);
 	else
 		return file_format_not_recognized(argv, path);
 
-	munmap((void *)file.buffer, file.size);
+	munmap(g_file.buffer, g_file.size);
 	return (0);
 }
