@@ -6,7 +6,7 @@
 /*   By: tlafay <tlafay@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/03 17:20:42 by tlafay            #+#    #+#             */
-/*   Updated: 2023/10/12 17:32:07 by tlafay           ###   ########.fr       */
+/*   Updated: 2023/10/13 17:05:15 by tlafay           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,16 +22,16 @@ void	print_sym64(void *content)
 	t_output	*output;
 
 	output = (t_output *)content;
-	if (output->value)
+	if (output->st_shndx != SHN_UNDEF)
 		// *.s represents the maximum size of the string.
 		printf("%016lx %c %.*s\n", output->value, output->type,
 			(int)(g_file.end - (void *)output->name), output->name);
 	else
-		printf("                 %c %s\n", output->type,
+		printf("%16c %c %s\n", ' ', output->type,
 			output->name);
 }
 
-void	parse_64bits()
+int	parse_64bits()
 {
 	Elf64_Shdr	*sections;
 	Elf64_Ehdr	*header;
@@ -42,7 +42,7 @@ void	parse_64bits()
 
 	// Need to cast in (void *) to make sure it increments byte after byte
 	if (out_of_bounds((void *)header + sizeof(Elf64_Ehdr)))
-		return;
+		return 2;
 
 	sections = (Elf64_Shdr *)((void *)g_file.buffer + header->e_shoff);
 
@@ -76,13 +76,20 @@ void	parse_64bits()
 			{
 				if (out_of_bounds((void *)symbol_names + symtab[j].st_name))
 					break;
+
 				add_section(&head, symtab[j].st_value,
 					get_type64(symtab[j], sections),
-					symbol_names + symtab[j].st_name);
+					symbol_names + symtab[j].st_name, symtab[j].st_shndx);
 			}
 		}
 	}
+
+	if (!head)
+		return 1;
+
 	ft_lstiter(head, print_sym64);
+
+	return 0;
 }
 
 char	get_type64(Elf64_Sym sym, Elf64_Shdr *shdr)
@@ -112,24 +119,27 @@ char	get_type64(Elf64_Sym sym, Elf64_Shdr *shdr)
 		c = 'A';
 	else if (sym.st_shndx == SHN_COMMON)
 		c = 'C';
-	else if (shdr[sym.st_shndx].sh_type == SHT_NOBITS
-		&& shdr[sym.st_shndx].sh_flags == (SHF_ALLOC | SHF_WRITE))
-		c = 'B';
-	else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS
-		&& shdr[sym.st_shndx].sh_flags == SHF_ALLOC)
-		c = 'R';
-	else if ((shdr[sym.st_shndx].sh_type == SHT_PROGBITS
-			|| shdr[sym.st_shndx].sh_type == SHT_INIT_ARRAY
-			|| shdr[sym.st_shndx].sh_type == SHT_FINI_ARRAY
-			|| shdr[sym.st_shndx].sh_type == SHT_FINI_ARRAY)
-		&& shdr[sym.st_shndx].sh_flags == (SHF_ALLOC | SHF_WRITE))
-		c = 'D';
-	else if (shdr[sym.st_shndx].sh_type == SHT_DYNAMIC)
-		c = 'D';
-	else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS
-		&& shdr[sym.st_shndx].sh_flags & SHF_EXECINSTR
-		&& ELF64_ST_TYPE(sym.st_info) == STT_FUNC)
-		c = 'T';
+	else if (!out_of_bounds((void *)shdr + sym.st_shndx * sizeof(Elf64_Shdr)))
+	{
+		if (shdr[sym.st_shndx].sh_type == SHT_NOBITS
+			&& shdr[sym.st_shndx].sh_flags == (SHF_ALLOC | SHF_WRITE))
+			c = 'B';
+		else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS
+			&& shdr[sym.st_shndx].sh_flags == SHF_ALLOC)
+			c = 'R';
+		else if ((shdr[sym.st_shndx].sh_type == SHT_PROGBITS
+				|| shdr[sym.st_shndx].sh_type == SHT_INIT_ARRAY
+				|| shdr[sym.st_shndx].sh_type == SHT_FINI_ARRAY
+				|| shdr[sym.st_shndx].sh_type == SHT_FINI_ARRAY)
+			&& shdr[sym.st_shndx].sh_flags == (SHF_ALLOC | SHF_WRITE))
+			c = 'D';
+		else if (shdr[sym.st_shndx].sh_type == SHT_DYNAMIC)
+			c = 'D';
+		else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS
+			&& shdr[sym.st_shndx].sh_flags & SHF_EXECINSTR
+			&& ELF64_ST_TYPE(sym.st_info) == STT_FUNC)
+			c = 'T';
+	}
 	else
 		c = '?';
 	if (c && ELF64_ST_BIND(sym.st_info) == STB_LOCAL && c != '?')

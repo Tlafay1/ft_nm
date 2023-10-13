@@ -6,7 +6,7 @@
 /*   By: tlafay <tlafay@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 16:20:43 by tlafay            #+#    #+#             */
-/*   Updated: 2023/10/12 16:43:42 by tlafay           ###   ########.fr       */
+/*   Updated: 2023/10/13 14:44:53 by tlafay           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ int	nm_strcmp(t_list *n1, t_list *n2)
 	return ((unsigned char)ft_tolower(*s1) - (unsigned char)ft_tolower(*s2));
 }
 
-int	add_section(t_list **head, long unsigned int value, char type, char *name)
+int	add_section(t_list **head, long unsigned int value, char type, char *name, uint16_t st_shndx)
 {
 	t_list		*node;
 	t_output	*output;
@@ -49,6 +49,7 @@ int	add_section(t_list **head, long unsigned int value, char type, char *name)
 	output->value = value;
 	output->type = type;
 	output->name = name;
+	output->st_shndx = st_shndx;
 	if (!output->type || output->type == 'a' || output->type == 'u')
 		return 1;
 	node = ft_lstnew((void *)output);

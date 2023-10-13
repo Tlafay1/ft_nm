@@ -6,7 +6,7 @@
 /*   By: tlafay <tlafay@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/25 05:38:19 by timothee          #+#    #+#             */
-/*   Updated: 2023/10/12 16:46:00 by tlafay           ###   ########.fr       */
+/*   Updated: 2023/10/13 17:05:38 by tlafay           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,18 +34,19 @@ typedef struct s_output
 {
 	long unsigned int	value;
 	unsigned char		type;
+	uint16_t			st_shndx;
 	char				*name;
 }	t_output;
 
 // Useful in many places
 extern t_file	g_file;
 
-void	parse_64bits();
-void	parse_32bits();
+int		parse_64bits();
+int		parse_32bits();
 char	get_type64(Elf64_Sym sym, Elf64_Shdr *shdr);
 char	get_type32(Elf32_Sym sym, Elf32_Shdr *shdr);
 int		add_section(t_list **head, long unsigned int value,
-			char type, char *name);
+			char type, char *name, uint16_t st_shndx);
 int 	out_of_bounds(void *ptr);
 
 #endif
