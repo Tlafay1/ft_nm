@@ -6,7 +6,7 @@
 /*   By: tlafay <tlafay@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/05 10:52:35 by tlafay            #+#    #+#             */
-/*   Updated: 2023/03/01 09:46:12 by tlafay           ###   ########.fr       */
+/*   Updated: 2023/10/30 18:07:26 by tlafay           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 # define LIBFT_H
 # include <stdlib.h>
 # include <unistd.h>
+# include <errno.h>
+# include <stdio.h>
 # include "get_next_line.h"
 
 typedef struct s_list
@@ -21,6 +23,13 @@ typedef struct s_list
 	void			*content;
 	struct s_list	*next;
 }	t_list;
+
+struct error_info
+{
+	const int value;
+	const char *const name;
+	const char *const msg;
+};
 
 t_list			*ft_lstmap(t_list *lst, void *(*f)(void *),
 					void (*del)(void *));
@@ -75,4 +84,6 @@ char			*ft_strtrim(char const *s1, char const *set);
 char			*ft_substr(char const *s, unsigned int start, size_t len);
 int				ft_tolower(int c);
 int				ft_toupper(int c);
+char			*ft_strerror (int errnoval);
+void			ft_perror(const char *s);
 #endif

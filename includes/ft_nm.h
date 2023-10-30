@@ -6,7 +6,7 @@
 /*   By: tlafay <tlafay@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/25 05:38:19 by timothee          #+#    #+#             */
-/*   Updated: 2023/10/13 17:05:38 by tlafay           ###   ########.fr       */
+/*   Updated: 2023/10/30 18:05:28 by tlafay           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,5 +48,7 @@ char	get_type32(Elf32_Sym sym, Elf32_Shdr *shdr);
 int		add_section(t_list **head, long unsigned int value,
 			char type, char *name, uint16_t st_shndx);
 int 	out_of_bounds(void *ptr);
+int		nm_error(char *prog_name, char *path, char *msg);
+int		syscall_error(char *prog_name, char *path);
 
 #endif

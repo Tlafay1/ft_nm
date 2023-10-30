@@ -4,7 +4,7 @@ NAME := ft_nm
 
 CFLAGS := -Wall -Werror -Wextra
 
-SRCS := ft_nm.c 32_bits.c 64_bits.c utils.c
+SRCS := ft_nm.c 32_bits.c 64_bits.c utils.c errors.c
 
 OBJS := ${SRCS:.c=.o}
 

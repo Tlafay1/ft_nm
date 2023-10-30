@@ -6,12 +6,14 @@
 /*   By: tlafay <tlafay@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/24 14:34:28 by tlafay            #+#    #+#             */
-/*   Updated: 2023/10/13 17:25:30 by tlafay           ###   ########.fr       */
+/*   Updated: 2023/10/30 18:05:56 by tlafay           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_nm.h"
-
+#include <stdio.h>
+#include <fcntl.h>
+#include <string.h>
 
 /*
 	Need to define the variable once
@@ -22,8 +24,11 @@ t_file	g_file;
 
 /*
 	Read the file specified in argument.
-	Returns a structure containing the size
-	of the file and the pointer to the buffer. 
+	Assigns the global structure to the
+	corresponding values.
+	Returns -1 if a syscall failed, 1 if
+	the path is a dir and 2 if it's not a
+	regular file. 
 */
 
 int read_file(char *path)
@@ -32,27 +37,24 @@ int read_file(char *path)
 	struct stat	buf;
 
 	fd = open(path, O_RDONLY);
-	if (fd == -1)
+	
+	if (fd < 0)
 		return -1;
+	
 	if (fstat(fd, &buf) == -1)
 		return -1;
+	
+	if (S_ISDIR(buf.st_mode))
+		return 1;
+	
+	if (!S_ISREG(buf.st_mode))
+		return 2;
+
 	g_file.size = buf.st_size;
 	g_file.buffer = mmap(0, g_file.size, PROT_READ, MAP_PRIVATE, fd, 0);
 	g_file.end = g_file.buffer + g_file.size;
 	return 0;
 }
-
-
-/*
-	Error message thrown when the file is not ELF
-*/
-
-int	nm_error(char *prog_name, char *path, char *message)
-{
-	printf("%s: %s: %s\n", prog_name, path, message);
-	return (1);
-}
-
 
 /*
 	Check if the file is an elf executable.
@@ -99,10 +101,17 @@ int	parse_elf(char *prog_name, char *path)
 	return (0);
 }
 
-int	ft_nm(char *path, char *prog_name, int print)
+int	ft_nm(char *prog_name, char *path, int print)
 {
-	if (read_file(path))
-		return nm_error(prog_name, path, "No such file");
+	int status = read_file(path);
+	if (status < 0)
+		return (syscall_error(prog_name, path));
+
+	if (status == 1)
+		return nm_error(prog_name, "Warning", ft_strjoin(path, " is a directory"));
+
+	if (status == 2)
+		return nm_error(prog_name, "Warning", ft_strjoin(path, " is not an ordinary file"));
 
 	if (out_of_bounds(g_file.buffer + EI_NIDENT)
 		|| !is_elf((Elf32_Ehdr *)g_file.buffer))
@@ -123,10 +132,11 @@ int	main(int argc, char **argv)
 
 	ret = 0;
 	if (argc == 1)
-		ret += ft_nm("a.out", argv[0], 0);
+		ret += ft_nm(argv[0], "a.out", 0);
 
 	for (int i = 1; argv[i]; i++)
 		// We basically check if there's more than 1 file in there
-		ret += ft_nm(argv[i], argv[0], i || !argv[i + 1]);
+		ret += ft_nm(argv[0], argv[i], i - 1 || argv[i + 1]);
+	
 	return (ret);
 }
