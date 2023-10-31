@@ -6,11 +6,16 @@
 /*   By: tlafay <tlafay@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/03 17:20:43 by tlafay            #+#    #+#             */
-/*   Updated: 2023/10/13 17:00:56 by tlafay           ###   ########.fr       */
+/*   Updated: 2023/10/31 13:58:03 by tlafay           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_nm.h"
+
+
+/*
+	Default display function, to print the output
+*/
 
 void	print_sym32(void *content)
 {
@@ -18,8 +23,8 @@ void	print_sym32(void *content)
 
 	output = (t_output *)content;
 	if (output->st_shndx != SHN_UNDEF)
-		printf("%08lx %c %s\n", output->value,
-			output->type, output->name);
+		printf("%08lx %c %.*s\n", output->value, output->type,
+			(int)(g_file.end - (void *)output->name), output->name);
 	else
 		printf("%8c %c %s\n", ' ', output->type,
 			output->name);
@@ -132,6 +137,8 @@ char	get_type32(Elf32_Sym sym, Elf32_Shdr *shdr)
 			&& shdr[sym.st_shndx].sh_flags & SHF_EXECINSTR
 			&& ELF32_ST_TYPE(sym.st_info) == STT_FUNC)
 			c = 'T';
+		else
+			c = '?';
 	}
 	else
 		c = '?';

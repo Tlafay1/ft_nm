@@ -6,7 +6,7 @@
 /*   By: tlafay <tlafay@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/03 17:20:42 by tlafay            #+#    #+#             */
-/*   Updated: 2023/10/13 17:05:15 by tlafay           ###   ########.fr       */
+/*   Updated: 2023/10/31 15:16:26 by tlafay           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,7 +125,7 @@ char	get_type64(Elf64_Sym sym, Elf64_Shdr *shdr)
 			&& shdr[sym.st_shndx].sh_flags == (SHF_ALLOC | SHF_WRITE))
 			c = 'B';
 		else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS
-			&& shdr[sym.st_shndx].sh_flags == SHF_ALLOC)
+			&& shdr[sym.st_shndx].sh_flags == 50)
 			c = 'R';
 		else if ((shdr[sym.st_shndx].sh_type == SHT_PROGBITS
 				|| shdr[sym.st_shndx].sh_type == SHT_INIT_ARRAY
@@ -139,6 +139,8 @@ char	get_type64(Elf64_Sym sym, Elf64_Shdr *shdr)
 			&& shdr[sym.st_shndx].sh_flags & SHF_EXECINSTR
 			&& ELF64_ST_TYPE(sym.st_info) == STT_FUNC)
 			c = 'T';
+		else
+			c = '?';
 	}
 	else
 		c = '?';
