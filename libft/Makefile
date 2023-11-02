@@ -24,6 +24,7 @@ all : $(NAME)
 
 $(NAME) : $(OBJS)
 	@ar rcs $(NAME) $(OBJS)
+	gcc -shared -o libft.so -fPIC $(SRCS)
 
 %.o : %.c $(INCLUDES)
 	@$(CC) -c $< $(CFLAGS)

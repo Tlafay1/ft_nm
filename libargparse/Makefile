@@ -1,12 +1,12 @@
 CC = gcc
 
-NAME = libftargparse.a
+NAME = libargparse.a
 
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = # -Wall -Werror -Wextra
 
-SRCS = 
+SRCS = argparse.c
 
-INCLUDES = 
+INCLUDES = argparse.h
 
 OBJS = ${SRCS:.c=.o}
 
@@ -14,11 +14,11 @@ RM  = rm -f
 
 all : $(NAME)
 
-$(NAME) : $(OBJS)
-	@ar rcs $(NAME) $(OBJS)
+$(NAME) : $(OBJS) $(SRCS)
+	@ar -rcs $(NAME) $(OBJS)
 
 %.o : %.c $(INCLUDES)
-	@$(CC) -c $< $(CFLAGS)
+	@$(CC) -c -I ../libft $< $(CFLAGS)
 
 clean :
 	@$(RM) $(OBJS)
