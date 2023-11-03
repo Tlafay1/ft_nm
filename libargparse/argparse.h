@@ -6,7 +6,7 @@
 /*   By: tlafay <tlafay@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/31 15:28:05 by tlafay            #+#    #+#             */
-/*   Updated: 2023/11/02 16:52:29 by tlafay           ###   ########.fr       */
+/*   Updated: 2023/11/03 11:40:57 by tlafay           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,21 +18,28 @@
 
 # include "libft.h"
 
+# define NO_ARG 0
+# define ONE_ARG 1
+# define INF_ARG 2
+
+# define SFLAG 0
+# define LFLAG 1
+
 typedef struct s_arg_option
 {
 	char	sflag;
 	char	*lflag;
+	char	*name;
 	char	*help;
 	char	*type;
-	int		valnum;
+	int		argnum;
 }	t_argo;
 
 typedef struct s_arg_return
 {
 	char	*name;
 	char	**values;
-	char	key;
-	char	*type;
+	t_argo	*option;
 }	t_argr;
 
 typedef struct s_argp_parse
@@ -42,13 +49,7 @@ typedef struct s_argp_parse
 	char	*doc;
 }	t_argp;
 
-typedef struct s_arg_list
-{
-	t_argr			*arg;
-	struct s_argl	*next;
-}	t_argl;
-
-t_argl	*parse_args(t_argp *argp, int argc, char const *argv[]);
+t_list	*parse_args(t_argp *argp, int argc, char const *argv[]);
 void	help_args(t_argp *argp, const char *prog_name);
 
 #endif

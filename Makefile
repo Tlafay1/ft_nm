@@ -2,7 +2,7 @@ CC = gcc
 
 NAME := test
 
-CFLAGS := -Wall -Werror -Wextra
+CFLAGS := -Wall -Werror -Wextra -g
 
 SRCS := test.c
 

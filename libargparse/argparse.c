@@ -6,7 +6,7 @@
 /*   By: tlafay <tlafay@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/31 15:27:31 by tlafay            #+#    #+#             */
-/*   Updated: 2023/11/02 16:45:45 by tlafay           ###   ########.fr       */
+/*   Updated: 2023/11/03 12:05:00 by tlafay           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,28 +38,73 @@ static t_argo	*_search_option(char sflag, char *lflag)
 	return (NULL);
 }
 
-static int _parse_short_option(char **args, t_argl **head)
+static int _wrong_arguments_number(t_argo *option, int flagtype)
+{
+	char	*message;
+
+	if (option->argnum == ONE_ARG)
+		message = "an";
+	else
+		message = "at least one";
+
+	if (flagtype == SFLAG)
+		printf("%s: option requires %s argument -- '%c'\n", _g_argv[0], message, option->sflag);
+
+	else
+		printf("%s: option '%s' requires %s argument\n", _g_argv[0], option->lflag, message);
+
+	printf("Try '%s --help' for more information\n", _g_argv[0]);
+
+	return (1);
+}
+
+static int	_get_option_arguments(char **args, t_argo *option,
+	char **values, int flagtype)
+{
+	// printf("%d\n", option->argnum);
+	switch (option->argnum)
+	{
+	case NO_ARG:
+		values = NULL;
+		return (0);
+	
+	case ONE_ARG:
+		if (!*args)
+			return (_wrong_arguments_number(option, flagtype));
+		values = (char **) malloc(2 * sizeof(char *));
+		values[0] = *args;
+		values[1] = NULL;
+		return (0);
+
+	default:
+		return (1);
+	}
+	// for (; *args; args++)
+}
+
+static int _parse_short_option(char **args, t_list **head)
 {
 	t_argo	*option;
+	t_argr	*ret;
 
-	(void)head;
-	(void)args;
-	(void)option;
-	char *arg = _g_argv[1] + 1;
+	char *arg = args[0] + 1;
+	args++;
 
+	ret = (t_argr *) malloc(sizeof(t_argr));
 	for (; *arg; arg++)
 	{
 		option = _search_option(*arg, NULL);
 
 		if (!option)
 			return (_unrecognized_option(*arg, NULL));
-
+		if (_get_option_arguments(args, option, ret->values, SFLAG))
+			return (1);
 	}
 
 	return (0);
 }
 
-static int _parse_long_option(char **args, t_argl **head)
+static int _parse_long_option(char **args, t_list **head)
 {
 	(void)head;
 	(void)args;
@@ -67,7 +112,7 @@ static int _parse_long_option(char **args, t_argl **head)
 	return (0);
 }
 
-static int _parse_option(char **args, t_argl **head)
+static int _parse_option(char **args, t_list **head)
 {
 	if (*(args[0] + 1) == '-')
 		return _parse_long_option(args, head);
@@ -90,9 +135,9 @@ void	help_args(t_argp *argp, const char *prog_name)
 	printf("  -%c, --%-17s%s\n", 'h', "help", "display this help and exit");
 }
 
-t_argl	*parse_args(t_argp *argp, int argc, char const *argv[])
+t_list	*parse_args(t_argp *argp, int argc, char const *argv[])
 {
-	t_argl	*head;
+	t_list	*head;
 
 	_g_argp = argp;
 	_g_argv = (char **) argv;

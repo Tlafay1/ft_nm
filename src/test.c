@@ -1,10 +1,11 @@
 #include "argparse.h"
 #include "libft.h"
 
+// What if I put the same name multiple times here ?
 static t_argo options[] = {
-	{'v', "verbose", "Enable verbose mode", NULL, 0},
-	{'i', "input", "Specify input file", "str", 1},
-	{'o', "output", "Specify output file", "str", 1},
+	{'v', "verbose", "verbose", "Enable verbose mode", NULL, 0},
+	{'i', "input", "input", "Specify input file", "str", ONE_ARG},
+	{'o', "output", "output", "Specify output file", "str", 1},
 	{0}
 };
 
