@@ -17,6 +17,18 @@ static t_argp argp = {
 
 int main(int argc, char const *argv[])
 {
-	parse_args(&argp, argc, argv);
+	t_list *head = parse_args(&argp, argc, argv);
+	t_argr *argr = get_next_arg(head);
+
+	if (argr->option)
+	{
+		printf("sflag: %c, lflag: %s, name: %s\n", argr->option->sflag,
+			argr->option->lflag, argr->option->name);
+	}
+	for (int i = 0; argr->values[i]; i++)
+		printf("%s\n", argr->values[i]);
+
+	free_args(head);
+
 	return 0;
 }
