@@ -94,6 +94,12 @@ char	get_type32(Elf32_Sym sym, Elf32_Shdr *shdr)
 {
 	char	c;
 
+	if (g_options.undefined_only)
+	{
+		if (sym.st_shndx != SHN_UNDEF)
+			return 0;
+	}
+
 	if (ELF32_ST_BIND(sym.st_info) == STB_GNU_UNIQUE)
 		c = 'u';
 	else if (ELF32_ST_TYPE(sym.st_info) == STT_SECTION)

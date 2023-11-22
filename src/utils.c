@@ -38,6 +38,11 @@ int	nm_strcmp(t_list *n1, t_list *n2)
 	return ((unsigned char)ft_tolower(*s1) - (unsigned char)ft_tolower(*s2));
 }
 
+int nm_strcmp_reverse(t_list *n1, t_list *n2)
+{
+	return -nm_strcmp(n1, n2);
+}
+
 int	add_section(t_list **head, long unsigned int value, char type, char *name, uint16_t st_shndx)
 {
 	t_list		*node;
@@ -55,7 +60,12 @@ int	add_section(t_list **head, long unsigned int value, char type, char *name, u
 	node = ft_lstnew((void *)output);
 	if (!node)
 		return -1;
-	ft_lstadd_sorted(head, node, nm_strcmp);
+	if (g_options.no_sort)
+		ft_lstadd_back(head, node);
+	else if (g_options.reverse_sort)
+		ft_lstadd_sorted(head, node, nm_strcmp_reverse);
+	else
+		ft_lstadd_sorted(head, node, nm_strcmp);
 	return 0;
 }
 

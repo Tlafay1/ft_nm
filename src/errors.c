@@ -17,7 +17,7 @@
 	Checks if the file can be opened sucessfully
 */
 
-int	check_filetype(mode_t m, char *prog_name, char *path)
+int	check_filetype(mode_t m, const char *prog_name, const char *path)
 {
 	char	*message = NULL;
 
@@ -38,7 +38,7 @@ int	check_filetype(mode_t m, char *prog_name, char *path)
 	Error message when opening the file
 */
 
-int	nm_error(char *prog_name, char *path, char *msg)
+int	nm_error(const char *prog_name, const char *path, char *msg)
 {
 	printf("%s: %s: %s\n", prog_name, path, msg);
 	return (1);
@@ -49,7 +49,7 @@ int	nm_error(char *prog_name, char *path, char *msg)
 	Error returned when a syscall failed
 */
 
-int	syscall_error(char *prog_name, char *path)
+int	syscall_error(const char *prog_name, const char *path)
 {
 	if (errno == ENOENT)
 		printf("%s: '%s': No such file\n", prog_name, path);

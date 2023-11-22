@@ -12,30 +12,29 @@
 
 #include "ft_nm.h"
 
-
 /*
 	Default display function, to print the output
 */
 
-void	print_sym64(void *content)
+void print_sym64(void *content)
 {
-	t_output	*output;
+	t_output *output;
 
 	output = (t_output *)content;
 	if (output->st_shndx != SHN_UNDEF)
 		// *.s represents the maximum size of the string.
 		printf("%016lx %c %.*s\n", output->value, output->type,
-			(int)(g_file.end - (void *)output->name), output->name);
+			   (int)(g_file.end - (void *)output->name), output->name);
 	else
 		printf("%16c %c %s\n", ' ', output->type,
-			output->name);
+			   output->name);
 }
 
-int	parse_64bits()
+int parse_64bits()
 {
-	Elf64_Shdr	*sections;
-	Elf64_Ehdr	*header;
-	t_list		*head;
+	Elf64_Shdr *sections;
+	Elf64_Ehdr *header;
+	t_list *head;
 
 	head = NULL;
 	header = (Elf64_Ehdr *)g_file.buffer;
@@ -60,12 +59,12 @@ int	parse_64bits()
 
 			if (out_of_bounds((void *)symtab + sizeof(Elf64_Sym)))
 				break;
-			
+
 			// This shouldn't be relevant for symtabs
 			// because it should always be 24, but just in case
 			if (sections[i].sh_entsize == 0)
 				continue;
-			
+
 			// Getting the number of symbols we need to iterate over
 			int symbol_num = sections[i].sh_size / sections[i].sh_entsize;
 
@@ -78,8 +77,8 @@ int	parse_64bits()
 					break;
 
 				add_section(&head, symtab[j].st_value,
-					get_type64(symtab[j], sections),
-					symbol_names + symtab[j].st_name, symtab[j].st_shndx);
+							get_type64(symtab[j], sections),
+							symbol_names + symtab[j].st_name, symtab[j].st_shndx);
 			}
 		}
 	}
@@ -92,9 +91,15 @@ int	parse_64bits()
 	return 0;
 }
 
-char	get_type64(Elf64_Sym sym, Elf64_Shdr *shdr)
+char get_type64(Elf64_Sym sym, Elf64_Shdr *shdr)
 {
-	char	c;
+	char c;
+
+	if (g_options.undefined_only)
+	{
+		if (sym.st_shndx != SHN_UNDEF)
+			return 0;
+	}
 
 	if (ELF64_ST_BIND(sym.st_info) == STB_GNU_UNIQUE)
 		c = 'u';
@@ -106,8 +111,7 @@ char	get_type64(Elf64_Sym sym, Elf64_Shdr *shdr)
 		if (sym.st_shndx == SHN_UNDEF)
 			c = 'w';
 	}
-	else if (ELF64_ST_BIND(sym.st_info) == STB_WEAK
-		&& ELF64_ST_TYPE(sym.st_info) == STT_OBJECT)
+	else if (ELF64_ST_BIND(sym.st_info) == STB_WEAK && ELF64_ST_TYPE(sym.st_info) == STT_OBJECT)
 	{
 		c = 'V';
 		if (sym.st_shndx == SHN_UNDEF)
@@ -121,23 +125,15 @@ char	get_type64(Elf64_Sym sym, Elf64_Shdr *shdr)
 		c = 'C';
 	else if (!out_of_bounds((void *)shdr + sym.st_shndx * sizeof(Elf64_Shdr)))
 	{
-		if (shdr[sym.st_shndx].sh_type == SHT_NOBITS
-			&& shdr[sym.st_shndx].sh_flags == (SHF_ALLOC | SHF_WRITE))
+		if (shdr[sym.st_shndx].sh_type == SHT_NOBITS && shdr[sym.st_shndx].sh_flags == (SHF_ALLOC | SHF_WRITE))
 			c = 'B';
-		else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS
-			&& shdr[sym.st_shndx].sh_flags == 50)
+		else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS && shdr[sym.st_shndx].sh_flags == 50)
 			c = 'R';
-		else if ((shdr[sym.st_shndx].sh_type == SHT_PROGBITS
-				|| shdr[sym.st_shndx].sh_type == SHT_INIT_ARRAY
-				|| shdr[sym.st_shndx].sh_type == SHT_FINI_ARRAY
-				|| shdr[sym.st_shndx].sh_type == SHT_FINI_ARRAY)
-			&& shdr[sym.st_shndx].sh_flags == (SHF_ALLOC | SHF_WRITE))
+		else if ((shdr[sym.st_shndx].sh_type == SHT_PROGBITS || shdr[sym.st_shndx].sh_type == SHT_INIT_ARRAY || shdr[sym.st_shndx].sh_type == SHT_FINI_ARRAY || shdr[sym.st_shndx].sh_type == SHT_FINI_ARRAY) && shdr[sym.st_shndx].sh_flags == (SHF_ALLOC | SHF_WRITE))
 			c = 'D';
 		else if (shdr[sym.st_shndx].sh_type == SHT_DYNAMIC)
 			c = 'D';
-		else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS
-			&& shdr[sym.st_shndx].sh_flags & SHF_EXECINSTR
-			&& ELF64_ST_TYPE(sym.st_info) == STT_FUNC)
+		else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS && shdr[sym.st_shndx].sh_flags & SHF_EXECINSTR && ELF64_ST_TYPE(sym.st_info) == STT_FUNC)
 			c = 'T';
 		else
 			c = '?';

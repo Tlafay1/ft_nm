@@ -1,10 +1,10 @@
 CC = gcc
 
-NAME := test
+NAME := ft_nm
 
 CFLAGS := -Wall -Werror -Wextra -g
 
-SRCS := test.c
+SRCS := 32_bits.c 64_bits.c errors.c ft_nm.c utils.c
 
 OBJS := ${SRCS:.c=.o}
 

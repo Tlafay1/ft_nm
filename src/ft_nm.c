@@ -15,28 +15,25 @@
 #include <fcntl.h>
 #include <string.h>
 
-/*
-	Need to define the variable once
-*/
 
-t_file	g_file;
-
+t_file			g_file;
+t_nm_options	g_options;
 
 /*
 	Read the file specified in argument.
 	Assigns the global structure to the
 	corresponding values.
 	Returns -1 if a syscall failed and
-	1 we are not opening a regular file. 
+	1 we are not opening a regular file.
 */
 
-int read_file(char *prog_name, char *path)
+int read_file(const char *prog_name, const char *path)
 {
-	int			fd;
-	struct stat	buf;
+	int fd;
+	struct stat buf;
 
 	fd = open(path, O_RDONLY);
-	
+
 	if (fd < 0 || fstat(fd, &buf) == -1)
 		return syscall_error(prog_name, path);
 
@@ -62,33 +59,30 @@ int is_elf(Elf32_Ehdr *header)
 	return 0;
 }
 
-
 /*
 	Check if the file is 64 bits.
 */
 
-int	is_64bits(Elf64_Ehdr *header)
+int is_64bits(Elf64_Ehdr *header)
 {
 	return (header->e_ident[EI_CLASS] == ELFCLASS64);
 }
 
-int	is_32bits(Elf32_Ehdr *header)
+int is_32bits(Elf32_Ehdr *header)
 {
 	return (header->e_ident[EI_CLASS] == ELFCLASS32);
 }
 
-int	parse_elf(char *prog_name, char *path)
+int parse_elf(const char *prog_name, const char *path)
 {
-	int	ret = 0;
-	
-	if (!out_of_bounds(g_file.buffer + sizeof(Elf64_Ehdr))
-		&& is_32bits((Elf32_Ehdr *)g_file.buffer))
+	int ret = 0;
+
+	if (!out_of_bounds(g_file.buffer + sizeof(Elf64_Ehdr)) && is_32bits((Elf32_Ehdr *)g_file.buffer))
 		ret = parse_32bits();
-	
-	else if (!out_of_bounds(g_file.buffer + sizeof(Elf64_Ehdr))
-		&& is_64bits((Elf64_Ehdr *)g_file.buffer))
+
+	else if (!out_of_bounds(g_file.buffer + sizeof(Elf64_Ehdr)) && is_64bits((Elf64_Ehdr *)g_file.buffer))
 		ret = parse_64bits();
-	
+
 	else
 		return nm_error(prog_name, path, "file format not recognized");
 
@@ -98,15 +92,14 @@ int	parse_elf(char *prog_name, char *path)
 	return (0);
 }
 
-int	ft_nm(char *prog_name, char *path, int print)
+int ft_nm(const char *prog_name, const char *path, int print)
 {
 	if (read_file(prog_name, path))
 		return (1);
-	
-	if (out_of_bounds(g_file.buffer + EI_NIDENT)
-		|| !is_elf((Elf32_Ehdr *)g_file.buffer))
+
+	if (out_of_bounds(g_file.buffer + EI_NIDENT) || !is_elf((Elf32_Ehdr *)g_file.buffer))
 		return (nm_error(prog_name, path, "file format not recognized"));
-	
+
 	if (print)
 		printf("\n%s:\n", path);
 
@@ -116,17 +109,62 @@ int	ft_nm(char *prog_name, char *path, int print)
 	return (ret);
 }
 
-int	main(int argc, char **argv)
+void	nm_parse_options(t_list *head)
+{
+	t_nm_options	options = {0, 0, 0, 0, 0};
+	t_argr			*argr;
+
+	while ((argr = get_next_option(head)))
+	{
+		if (argr->option->sflag == 'a')
+			options.debug_syms = 1;
+		else if (argr->option->sflag == 'g')
+			options.extern_only = 1;
+		else if (argr->option->sflag == 'p')
+			options.no_sort = 1;
+		else if (argr->option->sflag == 'r')
+			options.reverse_sort = 1;
+		else if (argr->option->sflag == 'u')
+			options.undefined_only = 1;
+	}
+
+	g_options = options;
+}
+
+static t_argo	options[] = {
+	{'a', "debug-syms", "debug-syms", "Display debugger-only symbols", NO_ARG},
+	{'g', "extern-only", "extern-only", "Display only external symbols", NO_ARG},
+	{'p', "no-sort", "no-sort", "Do not sort the symbols", NO_ARG},
+	{'r', "reverse-sort", "reverse-sort", "Sort in reverse order", NO_ARG},
+	{'u', "undefined-only", "undefined-only", "Display only undefined symbols", NO_ARG},
+	{0}
+};
+
+static t_argp argp = {
+	.options = options,
+	.args_doc = "[option(s)] [file(s)]",
+	.doc = " List symbols in [file(s)] (a.out by default).\n The options are:",
+};
+
+int main(int argc, const char **argv)
 {
 	int		ret;
+	t_list *head;
+	t_argr	*arg;
+	int		count;
 
 	ret = 0;
-	if (argc == 1)
+	if (!(head = parse_args(&argp, argc, argv)))
+		return (1);
+	nm_parse_options(head);
+	count = args_count(head);
+	if (!count)
 		ret += ft_nm(argv[0], "a.out", 0);
 
-	for (int i = 1; argv[i]; i++)
-		// We basically check if there's more than 1 file in there
-		ret += ft_nm(argv[0], argv[i], i - 1 || argv[i + 1]);
-	
+	else
+		while ((arg = get_next_arg(head)))
+			ret += ft_nm(argv[0], arg->values[0], count > 1);
+
+	free_args(head);
 	return (ret);
 }
