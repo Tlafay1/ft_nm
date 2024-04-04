@@ -27,7 +27,7 @@ $(NAME) : $(OBJDIR)
 
 obj/%.o : src/%.c $(INCDIR) Makefile
 	mkdir -p obj
-	$(CC) -c $< -I includes -I libft -I libargparse $(CFLAGS) -o $@
+	$(CC) -c $< -I includes -I libft -I libargparse/include $(CFLAGS) -o $@
 
 clean :
 	$(MAKE) -C ./libft $@

@@ -15,9 +15,8 @@
 #include <fcntl.h>
 #include <string.h>
 
-
-t_file			g_file;
-t_nm_options	g_options;
+t_file g_file;
+t_nm_options g_options;
 
 /*
 	Read the file specified in argument.
@@ -109,10 +108,10 @@ int ft_nm(const char *prog_name, const char *path, int print)
 	return (ret);
 }
 
-void	nm_parse_options(t_list *head)
+void nm_parse_options(t_list *head)
 {
-	t_nm_options	options = {0, 0, 0, 0, 0};
-	t_argr			*argr;
+	t_nm_options options = {0, 0, 0, 0, 0};
+	t_argr *argr;
 
 	while ((argr = get_next_option(head)))
 	{
@@ -131,14 +130,13 @@ void	nm_parse_options(t_list *head)
 	g_options = options;
 }
 
-static t_argo	options[] = {
+static t_argo options[] = {
 	{'a', "debug-syms", "debug-syms", "Display debugger-only symbols", NO_ARG},
 	{'g', "extern-only", "extern-only", "Display only external symbols", NO_ARG},
 	{'p', "no-sort", "no-sort", "Do not sort the symbols", NO_ARG},
 	{'r', "reverse-sort", "reverse-sort", "Sort in reverse order", NO_ARG},
 	{'u', "undefined-only", "undefined-only", "Display only undefined symbols", NO_ARG},
-	{0}
-};
+	{0}};
 
 static t_argp argp = {
 	.options = options,
@@ -146,15 +144,18 @@ static t_argp argp = {
 	.doc = " List symbols in [file(s)] (a.out by default).\n The options are:",
 };
 
-int main(int argc, const char **argv)
+int main(__attribute__((unused)) int argc, const char *argv[])
 {
-	int		ret;
+	dprintf(1, "Value: %d %s\n", argc, argv[0]);
+	int ret;
 	t_list *head;
-	t_argr	*arg;
-	int		count;
-
+	t_argr *arg;
+	int count;
 	ret = 0;
-	if (!(head = parse_args(&argp, argc, argv)))
+	dprintf(1, "Coucou1\n");
+	dprintf(1, "%p %p %p\n", &argp, argv, &head);
+	dprintf(1, "%ld %ld %ld\n", sizeof(argp), sizeof(argv[0]), sizeof(head));
+	if (parse_args(&argp, argv, &head))
 		return (1);
 	nm_parse_options(head);
 	count = args_count(head);
