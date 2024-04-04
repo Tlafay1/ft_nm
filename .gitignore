@@ -4,3 +4,5 @@ test
 *.o
 *.a
 .vscode
+.gdb_history
+peda-session-*

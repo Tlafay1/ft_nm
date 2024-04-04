@@ -144,7 +144,7 @@ static t_argp argp = {
 	.doc = " List symbols in [file(s)] (a.out by default).\n The options are:",
 };
 
-int main(int argc, const char **argv)
+int main(__attribute__((unused)) int argc, const char *argv[])
 {
 	int ret;
 	t_list *head;

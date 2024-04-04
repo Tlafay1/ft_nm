@@ -22,12 +22,12 @@ $(NAME) : $(OBJDIR)
 	echo "[Compiling argparse]"
 	$(MAKE) -C ./libargparse
 	echo "[Compiling $(NAME)]"
-	$(CC) $(OBJDIR) ./libargparse/libargparse.a -o $(NAME) $(CFLAGS) -Llibft -lft -Wl,-R./libft
+	$(CC) $(OBJDIR) ./libargparse/lib/libargparse.a -o $(NAME) $(CFLAGS) -Llibft -lft -Wl,-R./libft
 	echo "[Done]"
 
 obj/%.o : src/%.c $(INCDIR) Makefile
 	mkdir -p obj
-	$(CC) -c $< -I includes -I libft -I libargparse $(CFLAGS) -o $@
+	$(CC) -c $< -I includes -I libft -I libargparse/include $(CFLAGS) -o $@
 
 clean :
 	$(MAKE) -C ./libft $@
