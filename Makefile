@@ -2,7 +2,9 @@ CC = gcc
 
 NAME := ft_nm
 
-CFLAGS := -Wall -Wextra -g
+CFLAGS := -Wall -Wextra
+
+TESTFLAGS := -Wall -Wextra -Werror
 
 SRCS := 32_bits.c 64_bits.c errors.c utils.c ft_nm.c main.c
 
@@ -45,7 +47,7 @@ fclean : clean
 	$(RM) $(NAME)
 
 test: libs $(OBJS)
-	clang++ $(CFLAGS) \
+	g++ $(TESTFLAGS) \
 		$(TESTS) \
 		$(filter-out obj/main.o, $(OBJS)) \
 		-o tests/test \
