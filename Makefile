@@ -10,9 +10,7 @@ OBJS := ${SRCS:.c=.o}
 
 OBJDIR := $(addprefix obj/, $(OBJS))
 
-INCLUDE := includes/ft_nm.h
-
-INCDIR := $(addprefix includes/, $(INCLUDES))
+INCLUDE := include/ft_nm.h
 
 all : $(NAME)
 
@@ -32,9 +30,9 @@ $(NAME) : libs $(OBJDIR)
 		-Wl,-R./libft
 	echo "[Done]"
 
-obj/%.o : src/%.c $(INCDIR) Makefile
+obj/%.o : src/%.c  $(INCLUDE) Makefile
 	mkdir -p obj
-	$(CC) $(CFLAGS) $< -o $@ -c -I./includes -I./libft -I./libargparse/include
+	$(CC) $(CFLAGS) $< -o $@ -c -I./include -I./libft -I./libargparse/include
 
 clean :
 	$(MAKE) -C ./libft $@

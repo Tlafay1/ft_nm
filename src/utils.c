@@ -12,11 +12,11 @@
 
 #include "ft_nm.h"
 
-int	nm_strcmp(t_list *n1, t_list *n2)
+int nm_strcmp(t_list *n1, t_list *n2)
 {
-	char		*s1;
-	char		*s2;
-	t_output	*tmp;
+	char *s1;
+	char *s2;
+	t_output *tmp;
 
 	tmp = n1->content;
 	s1 = tmp->name;
@@ -43,11 +43,13 @@ int nm_strcmp_reverse(t_list *n1, t_list *n2)
 	return -nm_strcmp(n1, n2);
 }
 
-int	add_section(t_list **head, long unsigned int value, char type, char *name, uint16_t st_shndx)
+int add_section(t_list **head, long unsigned int value, char type, char *name, uint16_t st_shndx)
 {
-	t_list		*node;
-	t_output	*output;
+	t_list *node;
+	t_output *output;
 
+	if (!type || type == 'a' || type == 'u')
+		return 1;
 	output = (t_output *)malloc(sizeof(t_output));
 	if (!output)
 		return -1;
@@ -55,8 +57,6 @@ int	add_section(t_list **head, long unsigned int value, char type, char *name, u
 	output->type = type;
 	output->name = name;
 	output->st_shndx = st_shndx;
-	if (!output->type || output->type == 'a' || output->type == 'u')
-		return 1;
 	node = ft_lstnew((void *)output);
 	if (!node)
 		return -1;

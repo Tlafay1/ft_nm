@@ -9,8 +9,7 @@ static t_argo options[] = {
 	{'t', "test", "test", "Display a test", NO_ARG},
 	{'o', "output", "output", "Specify output file", ONE_ARG},
 	{'i', "input", "input", "Specify input file", INF_ARG},
-	{0}
-};
+	{0}};
 
 /**
  * This structure holds the informations about the parser.
@@ -28,10 +27,11 @@ static t_argp argp = {
 
 int main(int argc, char const *argv[])
 {
+	t_list *head = NULL;
 	// Parse the arguments and store them in a linked list.
-	t_list *head = parse_args(&argp, argc, argv);
 	t_argr *argr;
 
+	parse_args(&argp, argv, &head);
 	// Loop through the options (e.g ./program -abc --option).
 	while ((argr = get_next_option(head)))
 	{

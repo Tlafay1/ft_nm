@@ -12,29 +12,28 @@
 
 #include "ft_nm.h"
 
-
 /*
 	Default display function, to print the output
 */
 
-void	print_sym32(void *content)
+void print_sym32(void *content)
 {
-	t_output	*output;
+	t_output *output;
 
 	output = (t_output *)content;
 	if (output->st_shndx != SHN_UNDEF)
 		printf("%08lx %c %.*s\n", output->value, output->type,
-			(int)(g_file.end - (void *)output->name), output->name);
+			   (int)(g_file.end - (void *)output->name), output->name);
 	else
 		printf("%8c %c %s\n", ' ', output->type,
-			output->name);
+			   output->name);
 }
 
-int	parse_32bits()
+int parse_32bits()
 {
-	Elf32_Shdr	*sections;
-	Elf32_Ehdr	*header;
-	t_list		*head;
+	Elf32_Shdr *sections;
+	Elf32_Ehdr *header;
+	t_list *head;
 
 	head = NULL;
 	header = (Elf32_Ehdr *)g_file.buffer;
@@ -59,12 +58,12 @@ int	parse_32bits()
 
 			if (out_of_bounds((void *)symtab + sizeof(Elf32_Sym)))
 				break;
-			
+
 			// This shouldn't be relevant for symtabs
 			// because it should always be 24, but just in case
 			if (sections[i].sh_entsize == 0)
 				continue;
-			
+
 			// Getting the number of symbols we need to iterate over
 			int symbol_num = sections[i].sh_size / sections[i].sh_entsize;
 
@@ -77,8 +76,8 @@ int	parse_32bits()
 					break;
 
 				add_section(&head, symtab[j].st_value,
-					get_type32(symtab[j], sections),
-					symbol_names + symtab[j].st_name, symtab[j].st_shndx);
+							get_type32(symtab[j], sections),
+							symbol_names + symtab[j].st_name, symtab[j].st_shndx);
 			}
 		}
 	}
@@ -86,13 +85,14 @@ int	parse_32bits()
 		return 1;
 
 	ft_lstiter(head, print_sym32);
-	
+	ft_lstclear(&head, free);
+
 	return 0;
 }
 
-char	get_type32(Elf32_Sym sym, Elf32_Shdr *shdr)
+char get_type32(Elf32_Sym sym, Elf32_Shdr *shdr)
 {
-	char	c;
+	char c;
 
 	if (g_options.undefined_only)
 	{
@@ -110,8 +110,7 @@ char	get_type32(Elf32_Sym sym, Elf32_Shdr *shdr)
 		if (sym.st_shndx == SHN_UNDEF)
 			c = 'w';
 	}
-	else if (ELF32_ST_BIND(sym.st_info) == STB_WEAK
-		&& ELF32_ST_TYPE(sym.st_info) == STT_OBJECT)
+	else if (ELF32_ST_BIND(sym.st_info) == STB_WEAK && ELF32_ST_TYPE(sym.st_info) == STT_OBJECT)
 	{
 		c = 'V';
 		if (sym.st_shndx == SHN_UNDEF)
@@ -125,23 +124,15 @@ char	get_type32(Elf32_Sym sym, Elf32_Shdr *shdr)
 		c = 'C';
 	else if (!out_of_bounds((void *)shdr + sym.st_shndx * sizeof(Elf32_Shdr)))
 	{
-		if (shdr[sym.st_shndx].sh_type == SHT_NOBITS
-			&& shdr[sym.st_shndx].sh_flags == (SHF_ALLOC | SHF_WRITE))
+		if (shdr[sym.st_shndx].sh_type == SHT_NOBITS && shdr[sym.st_shndx].sh_flags == (SHF_ALLOC | SHF_WRITE))
 			c = 'B';
-		else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS
-			&& shdr[sym.st_shndx].sh_flags == SHF_ALLOC)
+		else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS && shdr[sym.st_shndx].sh_flags == SHF_ALLOC)
 			c = 'R';
-		else if ((shdr[sym.st_shndx].sh_type == SHT_PROGBITS
-				|| shdr[sym.st_shndx].sh_type == SHT_INIT_ARRAY
-				|| shdr[sym.st_shndx].sh_type == SHT_FINI_ARRAY
-				|| shdr[sym.st_shndx].sh_type == SHT_FINI_ARRAY)
-			&& shdr[sym.st_shndx].sh_flags == (SHF_ALLOC | SHF_WRITE))
+		else if ((shdr[sym.st_shndx].sh_type == SHT_PROGBITS || shdr[sym.st_shndx].sh_type == SHT_INIT_ARRAY || shdr[sym.st_shndx].sh_type == SHT_FINI_ARRAY || shdr[sym.st_shndx].sh_type == SHT_FINI_ARRAY) && shdr[sym.st_shndx].sh_flags == (SHF_ALLOC | SHF_WRITE))
 			c = 'D';
 		else if (shdr[sym.st_shndx].sh_type == SHT_DYNAMIC)
 			c = 'D';
-		else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS
-			&& shdr[sym.st_shndx].sh_flags & SHF_EXECINSTR
-			&& ELF32_ST_TYPE(sym.st_info) == STT_FUNC)
+		else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS && shdr[sym.st_shndx].sh_flags & SHF_EXECINSTR && ELF32_ST_TYPE(sym.st_info) == STT_FUNC)
 			c = 'T';
 		else
 			c = '?';

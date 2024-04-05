@@ -87,6 +87,7 @@ int parse_64bits()
 		return 1;
 
 	ft_lstiter(head, print_sym64);
+	ft_lstclear(&head, free);
 
 	return 0;
 }
