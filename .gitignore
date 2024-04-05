@@ -6,3 +6,5 @@ test
 .vscode
 .gdb_history
 peda-session-*
+a
+b

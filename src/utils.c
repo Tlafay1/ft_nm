@@ -69,6 +69,12 @@ int add_section(t_list **head, long unsigned int value, char type, char *name, u
 	return 0;
 }
 
+/**
+ * @brief Check that the pointer is not out of bounds and won't cause a segfault.
+ *
+ * @param ptr The pointer to check.
+ * @return A boolean indicating if the pointer is out of bounds.
+ */
 int out_of_bounds(void *ptr)
 {
 	return ptr > (void *)g_file.end;
