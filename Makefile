@@ -10,24 +10,31 @@ OBJS := ${SRCS:.c=.o}
 
 OBJDIR := $(addprefix obj/, $(OBJS))
 
-INCLUDES := ft_nm.h
+INCLUDE := includes/ft_nm.h
 
 INCDIR := $(addprefix includes/, $(INCLUDES))
 
 all : $(NAME)
 
-$(NAME) : $(OBJDIR)
-	echo "[Compiling libft]"
+libs:
 	$(MAKE) -C ./libft
-	echo "[Compiling argparse]"
 	$(MAKE) -C ./libargparse
+
+$(NAME) : libs $(OBJDIR)
 	echo "[Compiling $(NAME)]"
-	$(CC) $(OBJDIR) ./libargparse/lib/libargparse.a -o $(NAME) $(CFLAGS) -Llibft -lft -Wl,-R./libft
+	$(CC) $(CFLAGS) \
+		$(OBJDIR) \
+		-o $(NAME) \
+		-Llibft \
+		-L libargparse/lib \
+		-lft \
+		-largparse \
+		-Wl,-R./libft
 	echo "[Done]"
 
 obj/%.o : src/%.c $(INCDIR) Makefile
 	mkdir -p obj
-	$(CC) -c $< -I includes -I libft -I libargparse/include $(CFLAGS) -o $@
+	$(CC) $(CFLAGS) $< -o $@ -c -I./includes -I./libft -I./libargparse/include
 
 clean :
 	$(MAKE) -C ./libft $@
