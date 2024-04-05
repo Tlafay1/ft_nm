@@ -4,11 +4,13 @@ NAME := ft_nm
 
 CFLAGS := -Wall -Wextra -g
 
-SRCS := 32_bits.c 64_bits.c errors.c ft_nm.c utils.c
+SRCS := 32_bits.c 64_bits.c errors.c utils.c ft_nm.c main.c
 
-OBJS := ${SRCS:.c=.o}
+TESTS := main.cpp tests.cpp
 
-OBJDIR := $(addprefix obj/, $(OBJS))
+TESTS := $(addprefix tests/, ${TESTS})
+
+OBJS := $(addprefix obj/, ${SRCS:.c=.o})
 
 INCLUDE := include/ft_nm.h
 
@@ -18,10 +20,10 @@ libs:
 	$(MAKE) -C ./libft
 	$(MAKE) -C ./libargparse
 
-$(NAME) : libs $(OBJDIR)
+$(NAME) : libs $(OBJS)
 	echo "[Compiling $(NAME)]"
 	$(CC) $(CFLAGS) \
-		$(OBJDIR) \
+		$(OBJS) \
 		-o $(NAME) \
 		-Llibft \
 		-L libargparse/lib \
@@ -36,11 +38,29 @@ obj/%.o : src/%.c  $(INCLUDE) Makefile
 
 clean :
 	$(MAKE) -C ./libft $@
-	$(RM) $(OBJDIR)
+	$(RM) $(OBJS)
 
 fclean : clean
 	$(MAKE) -C ./libft $@
-	$(RM) $(NAME) 
+	$(RM) $(NAME)
+
+test: libs $(OBJS)
+	clang++ $(CFLAGS) \
+		$(TESTS) \
+		$(filter-out obj/main.o, $(OBJS)) \
+		-o tests/test \
+		-Llibft \
+		-Llibargparse/lib \
+		-Wl,-R./libft \
+		-I./include \
+		-I./libft \
+		-I./libargparse/include \
+		-pthread \
+		-lgtest \
+		-largparse \
+		-lft
+	./tests/test
+	$(RM) tests/test
 
 re : fclean all
 

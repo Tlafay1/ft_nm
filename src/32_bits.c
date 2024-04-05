@@ -78,6 +78,7 @@ int parse_32bits()
 				add_section(&head, symtab[j].st_value,
 							get_type32(symtab[j], sections),
 							symbol_names + symtab[j].st_name, symtab[j].st_shndx);
+				// print_sym_debug_type32(symtab[j], sections, symbol_names + symtab[j].st_name);
 			}
 		}
 	}
@@ -88,6 +89,174 @@ int parse_32bits()
 	ft_lstclear(&head, free);
 
 	return 0;
+}
+
+__attribute__((warning("This function is for debugging only"))) void print_sym_debug_type32(Elf32_Sym sym, Elf32_Shdr *shdr, char *name)
+{
+	// if (!out_of_bounds((char *)(g_file.buffer + shdr[sym.st_shndx].sh_offset + sym.st_name)))
+	printf("Symbol name: %s\n", name);
+	printf("Symbol value: %x\n", sym.st_value);
+	printf("Symbol size: %x\n", sym.st_size);
+	printf("Symbol type: %d\n", ELF32_ST_TYPE(sym.st_info));
+	printf("Symbol bind: %d\n", ELF32_ST_BIND(sym.st_info));
+	printf("Symbol visibility: %d\n", ELF32_ST_VISIBILITY(sym.st_other));
+	printf("Symbol section index: %d\n", sym.st_shndx);
+
+	if (ELF32_ST_TYPE(sym.st_info) == STT_NOTYPE)
+		printf("ELF32_ST_TYPE(sym.st_info) == STT_NOTYPE\n");
+	else if (ELF32_ST_TYPE(sym.st_info) == STT_OBJECT)
+		printf("ELF32_ST_TYPE(sym.st_info) == STT_OBJECT\n");
+	else if (ELF32_ST_TYPE(sym.st_info) == STT_FUNC)
+		printf("ELF32_ST_TYPE(sym.st_info) == STT_FUNC\n");
+	else if (ELF32_ST_TYPE(sym.st_info) == STT_SECTION)
+		printf("ELF32_ST_TYPE(sym.st_info) == STT_SECTION\n");
+	else if (ELF32_ST_TYPE(sym.st_info) == STT_FILE)
+		printf("ELF32_ST_TYPE(sym.st_info) == STT_FILE\n");
+	else if (ELF32_ST_TYPE(sym.st_info) == STT_COMMON)
+		printf("ELF32_ST_TYPE(sym.st_info) == STT_COMMON\n");
+	else if (ELF32_ST_TYPE(sym.st_info) == STT_TLS)
+		printf("ELF32_ST_TYPE(sym.st_info) == STT_TLS\n");
+	else if (ELF32_ST_TYPE(sym.st_info) == STT_GNU_IFUNC)
+		printf("ELF32_ST_TYPE(sym.st_info) == STT_GNU_IFUNC\n");
+	else if (ELF32_ST_TYPE(sym.st_info) == STT_LOOS)
+		printf("ELF32_ST_TYPE(sym.st_info) == STT_LOOS\n");
+	else if (ELF32_ST_TYPE(sym.st_info) == STT_HIOS)
+		printf("ELF32_ST_TYPE(sym.st_info) == STT_HIOS\n");
+	else if (ELF32_ST_TYPE(sym.st_info) == STT_LOPROC)
+		printf("ELF32_ST_TYPE(sym.st_info) == STT_LOPROC\n");
+	else if (ELF32_ST_TYPE(sym.st_info) == STT_HIPROC)
+		printf("ELF32_ST_TYPE(sym.st_info) == STT_HIPROC\n");
+	else
+		printf("ELF32_ST_TYPE(sym.st_info) == %d\n", ELF32_ST_TYPE(sym.st_info));
+
+	if (ELF32_ST_BIND(sym.st_info) == STB_LOCAL)
+		printf("ELF32_ST_BIND(sym.st_info) == STB_LOCAL\n");
+	else if (ELF32_ST_BIND(sym.st_info) == STB_GLOBAL)
+		printf("ELF32_ST_BIND(sym.st_info) == STB_GLOBAL\n");
+	else if (ELF32_ST_BIND(sym.st_info) == STB_WEAK)
+		printf("ELF32_ST_BIND(sym.st_info) == STB_WEAK\n");
+	else if (ELF32_ST_BIND(sym.st_info) == STB_NUM)
+		printf("ELF32_ST_BIND(sym.st_info) == STB_NUM\n");
+	else if (ELF32_ST_BIND(sym.st_info) == STB_LOOS)
+		printf("ELF32_ST_BIND(sym.st_info) == STB_LOOS\n");
+	else if (ELF32_ST_BIND(sym.st_info) == STB_HIOS)
+		printf("ELF32_ST_BIND(sym.st_info) == STB_HIOS\n");
+	else if (ELF32_ST_BIND(sym.st_info) == STB_LOPROC)
+		printf("ELF32_ST_BIND(sym.st_info) == STB_LOPROC\n");
+	else if (ELF32_ST_BIND(sym.st_info) == STB_HIPROC)
+		printf("ELF32_ST_BIND(sym.st_info) == STB_HIPROC\n");
+	else
+		printf("ELF32_ST_BIND(sym.st_info) == %d\n", ELF32_ST_BIND(sym.st_info));
+
+	if (ELF32_ST_VISIBILITY(sym.st_other) == STV_DEFAULT)
+		printf("ELF32_ST_VISIBILITY(sym.st_other) == STV_DEFAULT\n");
+	else if (ELF32_ST_VISIBILITY(sym.st_other) == STV_INTERNAL)
+		printf("ELF32_ST_VISIBILITY(sym.st_other) == STV_INTERNAL\n");
+	else if (ELF32_ST_VISIBILITY(sym.st_other) == STV_HIDDEN)
+		printf("ELF32_ST_VISIBILITY(sym.st_other) == STV_HIDDEN\n");
+	else if (ELF32_ST_VISIBILITY(sym.st_other) == STV_PROTECTED)
+		printf("ELF32_ST_VISIBILITY(sym.st_other) == STV_PROTECTED\n");
+	else
+		printf("ELF32_ST_VISIBILITY(sym.st_other) == %d\n", ELF32_ST_VISIBILITY(sym.st_other));
+
+	if (sym.st_shndx == SHN_UNDEF)
+		printf("sym.st_shndx == SHN_UNDEF\n");
+	else if (sym.st_shndx == SHN_LORESERVE)
+		printf("sym.st_shndx == SHN_LORESERVE\n");
+	else if (sym.st_shndx == SHN_LOPROC)
+		printf("sym.st_shndx == SHN_LOPROC\n");
+	else if (sym.st_shndx == SHN_BEFORE)
+		printf("sym.st_shndx == SHN_BEFORE\n");
+	else if (sym.st_shndx == SHN_AFTER)
+		printf("sym.st_shndx == SHN_AFTER\n");
+	else if (sym.st_shndx == SHN_HIPROC)
+		printf("sym.st_shndx == SHN_HIPROC\n");
+	else if (sym.st_shndx == SHN_ABS)
+		printf("sym.st_shndx == SHN_ABS\n");
+	else if (sym.st_shndx == SHN_COMMON)
+		printf("sym.st_shndx == SHN_COMMON\n");
+	else if (sym.st_shndx == SHN_HIRESERVE)
+		printf("sym.st_shndx == SHN_HIRESERVE\n");
+	else
+		printf("sym.st_shndx == %d\n", sym.st_shndx);
+
+	if (!out_of_bounds((void *)shdr + sym.st_shndx * sizeof(Elf32_Shdr)))
+	{
+		if (shdr[sym.st_shndx].sh_type == SHT_NULL)
+			printf("shdr[sym.st_shndx].sh_type == SHT_NULL\n");
+		else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS)
+			printf("shdr[sym_shndx].sh_type == SHT_PROGBITS\n");
+		else if (shdr[sym.st_shndx].sh_type == SHT_SYMTAB)
+			printf("shdr[sym_shndx].sh_type == SHT_SYMTAB\n");
+		else if (shdr[sym.st_shndx].sh_type == SHT_STRTAB)
+			printf("shdr[sym_shndx].sh_type == SHT_STRTAB\n");
+		else if (shdr[sym.st_shndx].sh_type == SHT_RELA)
+			printf("shdr[sym_shndx].sh_type == SHT_RELA\n");
+		else if (shdr[sym.st_shndx].sh_type == SHT_HASH)
+			printf("shdr[sym_shndx].sh_type == SHT_HASH\n");
+		else if (shdr[sym.st_shndx].sh_type == SHT_DYNAMIC)
+			printf("shdr[sym_shndx].sh_type == SHT_DYNAMIC\n");
+		else if (shdr[sym.st_shndx].sh_type == SHT_NOTE)
+			printf("shdr[sym_shndx].sh_type == SHT_NOTE\n");
+		else if (shdr[sym.st_shndx].sh_type == SHT_NOBITS)
+			printf("shdr[sym_shndx].sh_type == SHT_NOBITS\n");
+		else if (shdr[sym.st_shndx].sh_type == SHT_REL)
+			printf("shdr[sym_shndx].sh_type == SHT_REL\n");
+		else if (shdr[sym.st_shndx].sh_type == SHT_SHLIB)
+			printf("shdr[sym_shndx].sh_type == SHT_SHLIB\n");
+		else if (shdr[sym.st_shndx].sh_type == SHT_DYNSYM)
+			printf("shdr[sym_shndx].sh_type == SHT_DYNSYM\n");
+		else if (shdr[sym.st_shndx].sh_type == SHT_INIT_ARRAY)
+			printf("shdr[sym_shndx].sh_type == SHT_INIT_ARRAY\n");
+		else if (shdr[sym.st_shndx].sh_type == SHT_FINI_ARRAY)
+			printf("shdr[sym_shndx].sh_type == SHT_FINI_ARRAY\n");
+		else if (shdr[sym.st_shndx].sh_type == SHT_PREINIT_ARRAY)
+			printf("shdr[sym_shndx].sh_type == SHT_PREINIT_ARRAY\n");
+		else if (shdr[sym.st_shndx].sh_type == SHT_GROUP)
+			printf("shdr[sym_shndx].sh_type == SHT_GROUP\n");
+		else if (shdr[sym.st_shndx].sh_type == SHT_SYMTAB_SHNDX)
+			printf("shdr[sym_shndx].sh_type == SHT_SYMTAB_SHNDX\n");
+		else if (shdr[sym.st_shndx].sh_type == SHT_LOOS)
+			printf("shdr[sym_shndx].sh_type == SHT_LOOS\n");
+		else if (shdr[sym.st_shndx].sh_type == SHT_HIOS)
+			printf("shdr[sym_shndx].sh_type == SHT_HIOS\n");
+		else if (shdr[sym.st_shndx].sh_type == SHT_LOPROC)
+			printf("shdr[sym_shndx].sh_type == SHT_LOPROC\n");
+		else if (shdr[sym.st_shndx].sh_type == SHT_HIPROC)
+			printf("shdr[sym_shndx].sh_type == SHT_HIPROC\n");
+		else
+			printf("shdr[sym_shndx].sh_type == %d\n", shdr[sym.st_shndx].sh_type);
+
+		if (shdr[sym.st_shndx].sh_flags & SHF_EXECINSTR)
+			printf("shdr[sym.st_shndx].sh_flags & SHF_EXECINSTR\n");
+		if (shdr[sym.st_shndx].sh_flags & SHF_ALLOC)
+			printf("shdr[sym.st_shndx].sh_flags & SHF_ALLOC\n");
+		if (shdr[sym.st_shndx].sh_flags & SHF_WRITE)
+			printf("shdr[sym.st_shndx].sh_flags & SHF_WRITE\n");
+		if (shdr[sym.st_shndx].sh_flags & SHF_MASKPROC)
+			printf("shdr[sym.st_shndx].sh_flags & SHF_MASKPROC\n");
+		if (shdr[sym.st_shndx].sh_flags & SHF_MERGE)
+			printf("shdr[sym.st_shndx].sh_flags & SHF_MERGE\n");
+		if (shdr[sym.st_shndx].sh_flags & SHF_STRINGS)
+			printf("shdr[sym.st_shndx].sh_flags & SHF_STRINGS\n");
+		if (shdr[sym.st_shndx].sh_flags & SHF_INFO_LINK)
+			printf("shdr[sym.st_shndx].sh_flags & SHF_INFO_LINK\n");
+		if (shdr[sym.st_shndx].sh_flags & SHF_LINK_ORDER)
+			printf("shdr[sym.st_shndx].sh_flags & SHF_LINK_ORDER\n");
+		if (shdr[sym.st_shndx].sh_flags & SHF_OS_NONCONFORMING)
+			printf("shdr[sym.st_shndx].sh_flags & SHF_OS_NONCONFORMING\n");
+		if (shdr[sym.st_shndx].sh_flags & SHF_GROUP)
+			printf("shdr[sym.st_shndx].sh_flags & SHF_GROUP\n");
+		if (shdr[sym.st_shndx].sh_flags & SHF_TLS)
+			printf("shdr[sym.st_shndx].sh_flags & SHF_TLS\n");
+		if (shdr[sym.st_shndx].sh_flags & SHF_COMPRESSED)
+			printf("shdr[sym.st_shndx].sh_flags & SHF_COMPRESSED\n");
+		if (shdr[sym.st_shndx].sh_flags & SHF_MASKOS)
+			printf("shdr[sym.st_shndx].sh_flags & SHF_MASKOS\n");
+		if (shdr[sym.st_shndx].sh_flags & SHF_MASKPROC)
+			printf("shdr[sym.st_shndx].sh_flags & SHF_MASKPROC\n");
+	}
+	printf("\n");
 }
 
 char get_type32(Elf32_Sym sym, Elf32_Shdr *shdr)
@@ -126,14 +295,14 @@ char get_type32(Elf32_Sym sym, Elf32_Shdr *shdr)
 	{
 		if (shdr[sym.st_shndx].sh_type == SHT_NOBITS && shdr[sym.st_shndx].sh_flags == (SHF_ALLOC | SHF_WRITE))
 			c = 'B';
-		else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS && shdr[sym.st_shndx].sh_flags == SHF_ALLOC)
-			c = 'R';
 		else if ((shdr[sym.st_shndx].sh_type == SHT_PROGBITS || shdr[sym.st_shndx].sh_type == SHT_INIT_ARRAY || shdr[sym.st_shndx].sh_type == SHT_FINI_ARRAY || shdr[sym.st_shndx].sh_type == SHT_FINI_ARRAY) && shdr[sym.st_shndx].sh_flags == (SHF_ALLOC | SHF_WRITE))
 			c = 'D';
 		else if (shdr[sym.st_shndx].sh_type == SHT_DYNAMIC)
 			c = 'D';
 		else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS && shdr[sym.st_shndx].sh_flags & SHF_EXECINSTR && ELF32_ST_TYPE(sym.st_info) == STT_FUNC)
 			c = 'T';
+		else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS && shdr[sym.st_shndx].sh_flags == SHF_ALLOC)
+			c = 'R';
 		else
 			c = '?';
 	}

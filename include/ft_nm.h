@@ -52,6 +52,7 @@ typedef struct s_output
 extern t_file g_file;
 extern t_nm_options g_options;
 
+int ft_nm_main(const char *argv[]);
 int parse_64bits();
 int parse_32bits();
 char get_type64(Elf64_Sym sym, Elf64_Shdr *shdr);
