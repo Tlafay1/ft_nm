@@ -1,31 +1,21 @@
 #include "tests.hpp"
 
-namespace
+class BinariesTests : public ::testing::Test
 {
-    class BinaryTests : public ::testing::Test
+
+protected:
+    void SetUp() override
     {
+        std::cout << "SetUp" << std::endl;
+    }
 
-    protected:
-        BinaryTests()
-        {
-        }
+    void TearDown() override
+    {
+        std::cout << "TearDown" << std::endl;
+    }
+};
 
-        virtual ~BinaryTests()
-        {
-        }
-
-        virtual void SetUp()
-        {
-            std::cout << "SetUp" << std::endl;
-        }
-
-        virtual void TearDown()
-        {
-            std::cout << "TearDown" << std::endl;
-        }
-    };
-}
-
-TEST(ArgumentParser, ParseArguments)
+TEST(BinariesTests, ParseArguments)
 {
+    std::cout << "IURHIGUHERIUGHIRG" << std::endl;
 }
