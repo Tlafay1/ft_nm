@@ -17,5 +17,12 @@ protected:
 
 TEST(BinariesTests, ParseArguments)
 {
-    std::cout << "IURHIGUHERIUGHIRG" << std::endl;
+    const char *args[3] = {"./ft_nm", "tests/binaries/valid", nullptr};
+    testing::internal::CaptureStdout();
+    ft_nm_main(args);
+    std::string output = testing::internal::GetCapturedStdout();
+    testing::internal::CaptureStdout();
+    system("nm tests/binaries/valid");
+    std::string expected = testing::internal::GetCapturedStdout();
+    ASSERT_EQ(output, expected);
 }
