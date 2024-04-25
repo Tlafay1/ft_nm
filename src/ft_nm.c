@@ -113,7 +113,7 @@ void nm_parse_options(t_list *head)
 	t_nm_options options = {0, 0, 0, 0, 0};
 	t_argr *argr;
 
-	while ((argr = get_next_option(head)))
+	while ((argr = get_next_option(&head)))
 	{
 		if (argr->option->sflag == 'a')
 			options.debug_syms = 1;
@@ -160,7 +160,7 @@ int ft_nm_main(const char *argv[])
 		ret += ft_nm(argv[0], "a.out", 0);
 
 	else
-		while ((arg = get_next_arg(head)))
+		while ((arg = get_next_arg(&head)))
 			ret += ft_nm(argv[0], arg->values[0], count > 1);
 
 	free_args(head);
