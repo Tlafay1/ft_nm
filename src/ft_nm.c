@@ -86,7 +86,7 @@ int parse_elf(const char *prog_name, const char *path)
 		return nm_error(prog_name, path, "file format not recognized");
 
 	if (ret)
-		return nm_error(prog_name, path, "no symbols");
+		nm_error(prog_name, path, "no symbols");
 
 	return (0);
 }

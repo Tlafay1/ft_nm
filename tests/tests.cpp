@@ -148,3 +148,13 @@ TEST(ReadFile, FileIsAnElfWithOptionUWithNoObjects)
     ASSERT_EQ(ret, 0);
     ASSERT_EQ(output, "");
 }
+
+TEST(ReadFile, ShBinCopy)
+{
+    const char *argv[] = {"./ft_nm", "-u", "tests/binaries/sh", NULL};
+    ::testing::internal::CaptureStdout();
+    int ret = ft_nm_main(argv);
+    std::string output = ::testing::internal::GetCapturedStdout();
+    ASSERT_EQ(ret, 0);
+    ASSERT_EQ(output, "./ft_nm: tests/binaries/sh: no symbols\n");
+}
