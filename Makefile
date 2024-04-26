@@ -33,13 +33,13 @@ libargparse: $(LIBARGPARSE_NAME) $(LIBARGPARSE_NAME)/configure
 	$(MAKE) -C ./$(LIBARGPARSE_NAME)
 
 $(LIBARGPARSE_NAME)/configure:
-	cd ./$(LIBARGPARSE_NAME) && ./configure
+	cd $(LIBARGPARSE_NAME) && ./configure
 
 $(LIBARGPARSE_NAME):
 	[ -d "./$(LIBARGPARSE_NAME)" ] || \
-		curl $(LIBARGPARSE_URL) -L -o $(LIBARGPARSE_NAME).tar.gz; \
+		(curl $(LIBARGPARSE_URL) -L -o $(LIBARGPARSE_NAME).tar.gz; \
 		tar -xf $(LIBARGPARSE_NAME).tar.gz; \
-		$(RM) $(LIBARGPARSE_NAME).tar.gz
+		$(RM) $(LIBARGPARSE_NAME).tar.gz)
 
 $(NAME) : libs $(OBJS)
 	echo "[Compiling $(NAME)]"
@@ -64,8 +64,10 @@ clean :
 
 fclean : clean
 	$(MAKE) -C ./libft $@
-	$(RM) $(LIBARGPARSE_NAME)
 	$(RM) $(NAME)
+
+distclean: fclean
+	$(RM) -r $(LIBARGPARSE_NAME)
 
 test: libs $(OBJS)
 	g++ $(TESTFLAGS) \
@@ -87,4 +89,14 @@ test: libs $(OBJS)
 
 re : fclean all
 
-.PHONY : all clean fclean re
+.PHONY : all \
+	re \
+	test \
+	libft \
+	clean \
+	fclean \
+	libargparse \
+	$(NAME) \
+	$(LIBARGPARSE_NAME) \
+	$(LIBARGPARSE_NAME)/configure
+
