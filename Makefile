@@ -68,6 +68,7 @@ fclean : clean
 
 distclean: fclean
 	$(RM) -r $(LIBARGPARSE_NAME)
+	$(RM) config.log config.status
 
 test: libs $(OBJS)
 	g++ $(TESTFLAGS) \
