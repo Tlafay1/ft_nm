@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   64_bits.c                                          :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: tlafay <tlafay@student.42.fr>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/02/03 17:20:42 by tlafay            #+#    #+#             */
-/*   Updated: 2023/11/02 10:38:29 by tlafay           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "ft_nm.h"
 
 /*
@@ -35,6 +23,7 @@ int parse_64bits()
 	Elf64_Shdr *sections;
 	Elf64_Ehdr *header;
 	t_list *head;
+	int section_count = 0;
 
 	head = NULL;
 	header = (Elf64_Ehdr *)g_file.buffer;
@@ -78,12 +67,13 @@ int parse_64bits()
 				add_section(&head, symtab[j].st_value,
 							get_type64(symtab[j], sections),
 							symbol_names + symtab[j].st_name, symtab[j].st_shndx);
+				section_count++;
 				// print_sym_debug_type64(symtab[j], sections, symbol_names + symtab[j].st_name);
 			}
 		}
 	}
 
-	if (!head)
+	if (!section_count)
 		return 1;
 
 	ft_lstiter(head, print_sym64);

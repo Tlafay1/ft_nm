@@ -96,7 +96,7 @@ int ft_nm(const char *prog_name, const char *path, int print)
 	if (read_file(prog_name, path))
 		return (1);
 
-	if (g_file.size < sizeof(ELFMAG))
+	if ((long unsigned int)g_file.size < sizeof(ELFMAG))
 		return (1);
 
 	if (!is_elf((Elf32_Ehdr *)g_file.buffer))
@@ -111,30 +111,24 @@ int ft_nm(const char *prog_name, const char *path, int print)
 	return (ret);
 }
 
-void nm_parse_options(t_list *head)
+void nm_parse_options(t_list *options_list)
 {
-	t_nm_options options = {0, 0, 0, 0, 0};
 	t_argr *argr;
 
-	while ((argr = get_next_option(&head)))
+	while ((argr = get_next_option(&options_list)))
 	{
-		if (argr->option->sflag == 'a')
-			options.debug_syms = 1;
-		else if (argr->option->sflag == 'g')
-			options.extern_only = 1;
+		if (argr->option->sflag == 'g')
+			g_options.extern_only = 1;
 		else if (argr->option->sflag == 'p')
-			options.no_sort = 1;
+			g_options.no_sort = 1;
 		else if (argr->option->sflag == 'r')
-			options.reverse_sort = 1;
+			g_options.reverse_sort = 1;
 		else if (argr->option->sflag == 'u')
-			options.undefined_only = 1;
+			g_options.undefined_only = 1;
 	}
-
-	g_options = options;
 }
 
 static t_argo options[] = {
-	{'a', "debug-syms", "debug-syms", "Display debugger-only symbols", NO_ARG},
 	{'g', "extern-only", "extern-only", "Display only external symbols", NO_ARG},
 	{'p', "no-sort", "no-sort", "Do not sort the symbols", NO_ARG},
 	{'r', "reverse-sort", "reverse-sort", "Sort in reverse order", NO_ARG},
@@ -150,25 +144,24 @@ static t_argp argp = {
 int ft_nm_main(const char *argv[])
 {
 	int ret;
-	t_list *head;
+	t_list *args_list;
+	t_list *options_list;
 	t_argr *arg;
 	int count;
 
 	ret = 0;
-	if (parse_args(&argp, argv, &head))
+	if (parse_args(&argp, argv, &args_list, &options_list))
 		return (1);
-	nm_parse_options(head);
-	count = args_count(head);
+	nm_parse_options(options_list);
+	count = args_count(args_list);
 	if (!count)
 		ret += ft_nm(argv[0], "a.out", 0);
 
 	else
-		while ((arg = get_next_arg(&head)))
-		{
-			printf("%s\n", arg->values[0]);
+		while ((arg = get_next_arg(&args_list)))
 			ret += ft_nm(argv[0], arg->values[0], count > 1);
-		}
 
-	free_args(head);
+	free_args(args_list);
+	free_args(options_list);
 	return (ret);
 }

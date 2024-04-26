@@ -26,7 +26,6 @@
 
 typedef struct s_nm_options
 {
-	int debug_syms;
 	int extern_only;
 	int no_sort;
 	int reverse_sort;
@@ -40,6 +39,10 @@ typedef struct s_file
 	int size;
 } t_file;
 
+/**
+ * @brief The output structure for the nm program. This describes a line that will be printed.
+ *
+ */
 typedef struct s_output
 {
 	long unsigned int value;
@@ -48,8 +51,16 @@ typedef struct s_output
 	char *name;
 } t_output;
 
-// Useful in many places
+/**
+ * @brief The global file informations.
+ *
+ */
 extern t_file g_file;
+
+/**
+ * @brief The global options flags for the program.
+ *
+ */
 extern t_nm_options g_options;
 
 int ft_nm_main(const char *argv[]);

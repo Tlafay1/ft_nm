@@ -2,9 +2,7 @@ CC = gcc
 
 NAME := ft_nm
 
-CFLAGS := -g
-
-TESTFLAGS := -Wall -Wextra -Werror
+CFLAGS := -Wall -Wextra -Werror
 
 SRCS := 32_bits.c 64_bits.c errors.c utils.c ft_nm.c main.c
 
@@ -16,7 +14,7 @@ OBJS := $(addprefix obj/, ${SRCS:.c=.o})
 
 INCLUDE := include/ft_nm.h
 
-LIBARGPARSE_VERSION = 1.0.3
+LIBARGPARSE_VERSION = 2.0.0
 
 LIBARGPARSE_URL = https://github.com/Tlafay1/libargparse/releases/download/v$(LIBARGPARSE_VERSION)/libargparse-$(LIBARGPARSE_VERSION).tar.gz
 
@@ -73,8 +71,7 @@ distclean: fclean
 test: tests/test
 
 tests/test: libs $(OBJS)
-	g++ $(TESTFLAGS) \
-		$(TESTS) \
+	g++ $(TESTS) \
 		$(filter-out obj/main.o, $(OBJS)) \
 		-o tests/test \
 		-Llibft \
