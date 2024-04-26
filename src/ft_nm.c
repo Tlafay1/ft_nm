@@ -96,7 +96,10 @@ int ft_nm(const char *prog_name, const char *path, int print)
 	if (read_file(prog_name, path))
 		return (1);
 
-	if (out_of_bounds(g_file.buffer + EI_NIDENT) || !is_elf((Elf32_Ehdr *)g_file.buffer))
+	if (g_file.size < sizeof(ELFMAG))
+		return (1);
+
+	if (!is_elf((Elf32_Ehdr *)g_file.buffer))
 		return (nm_error(prog_name, path, "file format not recognized"));
 
 	if (print)
@@ -161,7 +164,10 @@ int ft_nm_main(const char *argv[])
 
 	else
 		while ((arg = get_next_arg(&head)))
+		{
+			printf("%s\n", arg->values[0]);
 			ret += ft_nm(argv[0], arg->values[0], count > 1);
+		}
 
 	free_args(head);
 	return (ret);

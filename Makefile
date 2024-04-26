@@ -2,7 +2,7 @@ CC = gcc
 
 NAME := ft_nm
 
-CFLAGS := -Wall -Wextra
+CFLAGS := -g
 
 TESTFLAGS := -Wall -Wextra -Werror
 
@@ -70,7 +70,9 @@ distclean: fclean
 	$(RM) -r $(LIBARGPARSE_NAME)
 	$(RM) config.log config.status
 
-test: libs $(OBJS)
+test: tests/test
+
+tests/test: libs $(OBJS)
 	g++ $(TESTFLAGS) \
 		$(TESTS) \
 		$(filter-out obj/main.o, $(OBJS)) \
@@ -92,12 +94,10 @@ re : fclean all
 
 .PHONY : all \
 	re \
-	test \
+	libs \
 	libft \
 	clean \
 	fclean \
 	libargparse \
-	$(NAME) \
-	$(LIBARGPARSE_NAME) \
 	$(LIBARGPARSE_NAME)/configure
 

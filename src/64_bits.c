@@ -44,7 +44,6 @@ int parse_64bits()
 		return 2;
 
 	sections = (Elf64_Shdr *)((void *)g_file.buffer + header->e_shoff);
-
 	for (int i = 0; i < header->e_shnum; i++)
 	{
 		// Checking if we will go out of the file's limits in this loop iteration
@@ -265,11 +264,8 @@ char get_type64(Elf64_Sym sym, Elf64_Shdr *shdr)
 {
 	char c;
 
-	if (g_options.undefined_only)
-	{
-		if (sym.st_shndx != SHN_UNDEF)
-			return 0;
-	}
+	if (g_options.undefined_only && sym.st_shndx != SHN_UNDEF)
+		return 0;
 
 	if (ELF64_ST_BIND(sym.st_info) == STB_GNU_UNIQUE)
 		c = 'u';
@@ -301,7 +297,7 @@ char get_type64(Elf64_Sym sym, Elf64_Shdr *shdr)
 			c = 'D';
 		else if (shdr[sym.st_shndx].sh_type == SHT_DYNAMIC)
 			c = 'D';
-		else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS && shdr[sym.st_shndx].sh_flags & SHF_EXECINSTR && ELF64_ST_TYPE(sym.st_info) == STT_FUNC)
+		else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS && shdr[sym.st_shndx].sh_flags & SHF_EXECINSTR)
 			c = 'T';
 		else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS && shdr[sym.st_shndx].sh_flags & SHF_ALLOC)
 			c = 'R';
@@ -311,6 +307,6 @@ char get_type64(Elf64_Sym sym, Elf64_Shdr *shdr)
 	else
 		c = '?';
 	if (c && ELF64_ST_BIND(sym.st_info) == STB_LOCAL && c != '?')
-		c += 32;
+		c = ft_tolower(c);
 	return c;
 }
