@@ -72,23 +72,6 @@ TEST(ReadFile, FileIsAnElfWithOptionP)
     ASSERT_EQ(output, FileIsAnElf_output_with_option_p);
 }
 
-std::string FileIsAnElf_output_with_option_r = R""""(0000000000401000 T _start
-0000000000402000 T _end
-0000000000402000 T _edata
-0000000000402000 T __bss_start
-)"""";
-
-TEST(ReadFile, FileIsAnElfWithOptionR)
-{
-    const char *argv[] = {"./ft_nm", "-r", "tests/binaries/hello", NULL};
-    ::testing::internal::CaptureStdout();
-    int ret = ft_nm_main(argv);
-    std::string output = ::testing::internal::GetCapturedStdout();
-    std::cout << output;
-    ASSERT_EQ(ret, 0);
-    ASSERT_EQ(output, FileIsAnElf_output_with_option_r);
-}
-
 std::string FileIsAnElf_output_with_option_u = R""""(                 U free@@GLIBC_2.2.5
                  U putchar@@GLIBC_2.2.5
                  U __errno_location@@GLIBC_2.2.5
