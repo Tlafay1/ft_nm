@@ -8,7 +8,6 @@ test
 peda-session-*
 a
 b
-libargparse-*
 config.log
 config.status
 .idea
