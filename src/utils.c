@@ -14,14 +14,10 @@
 
 int nm_strcmp(t_list *n1, t_list *n2)
 {
-	char *s1;
-	char *s2;
-	t_output *tmp;
-
-	tmp = n1->content;
-	s1 = tmp->name;
+	t_output *tmp = n1->content;
+	char *s1 = tmp->name;
 	tmp = n2->content;
-	s2 = tmp->name;
+	char *s2 = tmp->name;
 	while (*s1 && !ft_isalnum(*s1))
 		s1++;
 	while (*s2 && !ft_isalnum(*s2))
@@ -45,19 +41,16 @@ int nm_strcmp_reverse(t_list *n1, t_list *n2)
 
 int add_section(t_list **head, long unsigned int value, char type, char *name, uint16_t st_shndx)
 {
-	t_list *node;
-	t_output *output;
-
 	if (!type || type == 'a' || type == 'u')
 		return 1;
-	output = (t_output *)malloc(sizeof(t_output));
+	t_output *output = malloc(sizeof(t_output));
 	if (!output)
 		return -1;
 	output->value = value;
 	output->type = type;
 	output->name = name;
 	output->st_shndx = st_shndx;
-	node = ft_lstnew((void *)output);
+	t_list *node = ft_lstnew(output);
 	if (!node)
 		return -1;
 	if (g_options.no_sort)
@@ -75,7 +68,7 @@ int add_section(t_list **head, long unsigned int value, char type, char *name, u
  * @param ptr The pointer to check.
  * @return A boolean indicating if the pointer is out of bounds.
  */
-int out_of_bounds(void *ptr)
+int out_of_bounds(const void *ptr)
 {
-	return ptr > (void *)g_file.end;
+	return ptr > g_file.end;
 }

@@ -6,9 +6,7 @@
 
 void print_sym32(void *content)
 {
-	t_output *output;
-
-	output = (t_output *)content;
+	const t_output *output = (t_output *) content;
 	if (output->st_shndx != SHN_UNDEF)
 		// *.s represents the maximum size of the string.
 		printf("%016lx %c %.*s\n", output->value, output->type,
@@ -20,19 +18,17 @@ void print_sym32(void *content)
 
 int parse_32bits()
 {
-	Elf32_Shdr *sections;
-	Elf32_Ehdr *header;
 	t_list *head;
 	int section_count = 0;
 
 	head = NULL;
-	header = (Elf32_Ehdr *)g_file.buffer;
+	Elf32_Ehdr *header = g_file.buffer;
 
 	// Need to cast in (void *) to make sure it increments byte after byte
 	if (out_of_bounds((void *)header + sizeof(Elf32_Ehdr)))
 		return 2;
 
-	sections = (Elf32_Shdr *)((void *)g_file.buffer + header->e_shoff);
+	Elf32_Shdr *sections = g_file.buffer + header->e_shoff;
 	for (int i = 0; i < header->e_shnum; i++)
 	{
 		// Checking if we will go out of the file's limits in this loop iteration
@@ -43,7 +39,7 @@ int parse_32bits()
 		if (sections[i].sh_type == SHT_SYMTAB)
 		{
 			// Points to the first byte of the section (see sh_offset)
-			Elf32_Sym *symtab = (Elf32_Sym *)(g_file.buffer + sections[i].sh_offset);
+			Elf32_Sym *symtab = g_file.buffer + sections[i].sh_offset;
 
 			if (out_of_bounds((void *)symtab + sizeof(Elf32_Sym)))
 				break;
@@ -54,7 +50,7 @@ int parse_32bits()
 				continue;
 
 			// Getting the number of symbols we need to iterate over
-			int symbol_num = sections[i].sh_size / sections[i].sh_entsize;
+			const int symbol_num = sections[i].sh_size / sections[i].sh_entsize;
 
 			// No need to check the out of bounds here, we only use this variable
 			// in add_section(), and a check is already implemented here.
@@ -82,7 +78,7 @@ int parse_32bits()
 	return 0;
 }
 
-__attribute__((warning("This function is for debugging only"))) void print_sym_debug_type32(Elf32_Sym sym, Elf32_Shdr *shdr, char *name)
+__attribute__((warning("This function is for debugging only"))) void print_sym_debug_type32(const Elf32_Sym sym, Elf32_Shdr *shdr, char *name)
 {
 	// if (!out_of_bounds((char *)(g_file.buffer + shdr[sym.st_shndx].sh_offset + sym.st_name)))
 	printf("Symbol name: %s\n", name);
@@ -250,7 +246,7 @@ __attribute__((warning("This function is for debugging only"))) void print_sym_d
 	printf("\n");
 }
 
-char get_type32(Elf32_Sym sym, Elf32_Shdr *shdr)
+char get_type32(const Elf32_Sym sym, Elf32_Shdr *shdr)
 {
 	char c;
 
@@ -261,17 +257,17 @@ char get_type32(Elf32_Sym sym, Elf32_Shdr *shdr)
 		c = 'u';
 	else if (ELF32_ST_TYPE(sym.st_info) == STT_SECTION)
 		c = 0;
-	else if (ELF32_ST_BIND(sym.st_info) == STB_WEAK)
-	{
-		c = 'W';
-		if (sym.st_shndx == SHN_UNDEF)
-			c = 'w';
-	}
 	else if (ELF32_ST_BIND(sym.st_info) == STB_WEAK && ELF32_ST_TYPE(sym.st_info) == STT_OBJECT)
 	{
 		c = 'V';
 		if (sym.st_shndx == SHN_UNDEF)
 			c = 'v';
+	}
+	else if (ELF32_ST_BIND(sym.st_info) == STB_WEAK)
+	{
+		c = 'W';
+		if (sym.st_shndx == SHN_UNDEF)
+			c = 'w';
 	}
 	else if (sym.st_shndx == SHN_UNDEF)
 		c = 'U';
@@ -283,13 +279,20 @@ char get_type32(Elf32_Sym sym, Elf32_Shdr *shdr)
 	{
 		if (shdr[sym.st_shndx].sh_type == SHT_NOBITS && shdr[sym.st_shndx].sh_flags == (SHF_ALLOC | SHF_WRITE))
 			c = 'B';
-		else if ((shdr[sym.st_shndx].sh_type == SHT_PROGBITS || shdr[sym.st_shndx].sh_type == SHT_INIT_ARRAY || shdr[sym.st_shndx].sh_type == SHT_FINI_ARRAY || shdr[sym.st_shndx].sh_type == SHT_FINI_ARRAY) && shdr[sym.st_shndx].sh_flags == (SHF_ALLOC | SHF_WRITE))
+		else if (
+			(
+				shdr[sym.st_shndx].sh_type == SHT_PROGBITS
+				|| shdr[sym.st_shndx].sh_type == SHT_INIT_ARRAY
+				|| shdr[sym.st_shndx].sh_type == SHT_FINI_ARRAY
+			)
+			&& shdr[sym.st_shndx].sh_flags == (SHF_ALLOC | SHF_WRITE))
 			c = 'D';
 		else if (shdr[sym.st_shndx].sh_type == SHT_DYNAMIC)
 			c = 'D';
 		else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS && shdr[sym.st_shndx].sh_flags & SHF_EXECINSTR)
 			c = 'T';
-		else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS && shdr[sym.st_shndx].sh_flags & SHF_ALLOC)
+		else if ((shdr[sym.st_shndx].sh_type == SHT_PROGBITS || shdr[sym.st_shndx].sh_type == SHT_NOTE)
+			&& shdr[sym.st_shndx].sh_flags & SHF_ALLOC)
 			c = 'R';
 		else
 			c = '?';

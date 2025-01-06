@@ -70,7 +70,7 @@ char get_type64(Elf64_Sym sym, Elf64_Shdr *shdr);
 char get_type32(Elf32_Sym sym, Elf32_Shdr *shdr);
 int add_section(t_list **head, long unsigned int value,
 				char type, char *name, uint16_t st_shndx);
-int out_of_bounds(void *ptr);
+int out_of_bounds(const void *ptr);
 int nm_error(const char *prog_name, const char *path, char *msg);
 int syscall_error(const char *prog_name, const char *path);
 int check_filetype(mode_t m, const char *prog_name, const char *path);
