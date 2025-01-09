@@ -111,11 +111,11 @@ int ft_nm(const char *prog_name, const char *path, int print)
 	return (ret);
 }
 
-void nm_parse_options(t_list *options_list)
+void nm_parse_options(t_args *args)
 {
 	t_argr *argr;
 
-	while ((argr = get_next_option(&options_list)))
+	while ((argr = get_next_option(args)))
 	{
 		if (argr->option->sflag == 'g')
 			g_options.extern_only = 1;
@@ -129,7 +129,7 @@ void nm_parse_options(t_list *options_list)
 }
 
 static t_argo options[] = {
-	{'g', "extern-only", "extern-only", "Display only external symbols", NO_ARG},
+	// {'g', "extern-only", "extern-only", "Display only external symbols", NO_ARG},
 	{'p', "no-sort", "no-sort", "Do not sort the symbols", NO_ARG},
 	{'r', "reverse-sort", "reverse-sort", "Sort in reverse order", NO_ARG},
 	{'u', "undefined-only", "undefined-only", "Display only undefined symbols", NO_ARG},
@@ -143,25 +143,21 @@ static t_argp argp = {
 
 int ft_nm_main(const char *argv[])
 {
-	int ret;
-	t_list *args_list;
-	t_list *options_list;
+	t_args *args;
 	t_argr *arg;
-	int count;
 
-	ret = 0;
-	if (parse_args(&argp, argv, &args_list, &options_list))
+	int ret = 0;
+	if (parse_args(&argp, argv, &args))
 		return (1);
-	nm_parse_options(options_list);
-	count = args_count(args_list);
+	nm_parse_options(args);
+	int count = args_count(args);
 	if (!count)
 		ret += ft_nm(argv[0], "a.out", 0);
 
 	else
-		while ((arg = get_next_arg(&args_list)))
+		while ((arg = get_next_arg(args)))
 			ret += ft_nm(argv[0], arg->values[0], count > 1);
 
-	free_args(args_list);
-	free_args(options_list);
+	free_args(args);
 	return (ret);
 }

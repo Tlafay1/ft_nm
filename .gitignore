@@ -11,3 +11,4 @@ b
 config.log
 config.status
 .idea
+libargparse-*

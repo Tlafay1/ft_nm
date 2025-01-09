@@ -52,7 +52,7 @@ typedef struct s_output
 } t_output;
 
 /**
- * @brief The global file informations.
+ * @brief The global file information.
  *
  */
 extern t_file g_file;
